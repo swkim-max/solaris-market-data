@@ -19,5 +19,19 @@
       "url": "/guide-solar-presale-checklist/",
       "file": "https://www.energy-solarislaw.net/content/files/2026/11/------------------------------------------------------------------------------------.pdf"
     }
-  ]
+  ],
+  "form": {
+    "action": "https://docs.google.com/forms/d/e/1FAIpQLScmgPKrpEnCTqVKuLHxY0rpNFKGYwIzlPylS2BYnk1t_HAz7w/formResponse",
+    "fields": {
+      "email": "entry.2021455219",
+      "name": "entry.1345783926",
+      "company": "entry.2067392986",
+      "title": "entry.554844575",
+      "guide": "entry.1637134892",
+      "agree": "entry.1374582371",
+      "extra": "entry.316651003",
+      "news": "entry.242063753",
+      "page": "entry.1958846208"
+    }
+  }
 }
