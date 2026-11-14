@@ -1,14 +1,22 @@
 {
   "title": "솔라리스 자료실",
   "all": "/guides/",
+  "newsletter": "Solarislaw Renewable Energy Team",
   "guides": [
     {
       "no": "GUIDE 01",
+      "isNew": true,
       "title": "태양광 발전소 분양 전 사전 체크리스트",
-      "desc": "분양사기 판결에서 법원이 본 토지·인허가·계약 구조·사업자를 계약 전에 직접 확인하는 18개 항목입니다.",
-      "meta": "PDF · 5쪽",
+      "cover": "태양광 발전소\n분양 전 사전\n체크리스트",
+      "hook": "분양 계약금은 발전소가 지어지기 전에 나갑니다. 법원이 유죄로 본 분양사기 3건에서는 토지 등기와 인허가 서류만 확인했어도 드러났을 문제가 사기의 근거가 됐습니다.",
+      "points": [
+        "등기부와 토지이용계획에서 먼저 볼 4가지",
+        "\"허가가 다 났다\"는 말을 서류로 확인하는 방법",
+        "계약서에 꼭 넣어야 할 대금 반환·보증보험 조항",
+        "판결에 나온 사업자의 말 6가지"
+      ],
+      "meta": "PDF 5쪽 · 체크 항목 18개",
       "url": "/guide-solar-presale-checklist/"
     }
-  ],
-  "newsletter": "Solarislaw Renewable Energy Team"
+  ]
 }

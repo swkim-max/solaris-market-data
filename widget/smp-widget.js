@@ -119,41 +119,81 @@
     '.smw-post{padding-top:16px}',
     /* 왼쪽 자료실 */
     '.smw-lrail{position:absolute;z-index:5}',
-    '.smw-lib{width:240px;word-break:keep-all;color:#3d3b37}',
-    '.smw-lib-h{display:flex;justify-content:space-between;align-items:baseline;font-size:11px;font-weight:800;letter-spacing:.06em;color:var(--ghost-accent-color,#60503e);padding-bottom:10px;border-bottom:1px solid #e6e4df}',
-    '.smw-lib-h a{font-size:11px;font-weight:700;letter-spacing:0;color:#8a8780 !important;text-decoration:none !important}',
-    '.smw-g{padding:16px 0;border-bottom:1px solid #eeece8}',
-    '.smw-g-cover{position:relative;height:132px;border-radius:6px;overflow:hidden;background:var(--ghost-accent-color,#60503e);color:#fff;padding:14px 14px 0;box-shadow:0 1px 0 rgba(0,0,0,.04),0 6px 16px -10px rgba(60,40,20,.5)}',
-    '.smw-g-cover::after{content:"";position:absolute;right:-34px;bottom:-40px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle at 40% 40%,#f7a23b 0,#e8731a 40%,rgba(232,115,26,0) 70%);opacity:.6}',
-    '.smw-g-no{font-size:9.5px;letter-spacing:.12em;opacity:.75}',
-    '.smw-g-ct{position:relative;z-index:1;font-size:15px;line-height:1.35;font-weight:800;margin-top:8px;letter-spacing:-.01em}',
-    '.smw-g-desc{font-size:12.5px;line-height:1.6;color:#5f5c56;margin:12px 0 0}',
-    '.smw-g-meta{font-size:11px;color:#a3a09a;margin-top:6px}',
-    '.smw-g-btn{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:12px;padding:10px 12px;border-radius:6px;background:var(--ghost-accent-color,#60503e);color:#fff !important;font-size:13px;font-weight:800;text-decoration:none !important;cursor:pointer}',
-    '.smw-g-btn:hover{filter:brightness(1.12)}',
-    '.smw-g-btn svg{flex:none}',
-    '.smw-lib-note{font-size:11px;line-height:1.6;color:#a3a09a;margin-top:10px}',
-    '.smw-f{margin-top:12px}',
-    '.smw-f input[type=email],.smw-f input[type=text]{display:block;width:100%;font:inherit;font-size:13px;padding:9px 10px;border:1px solid #dcd8d0;border-radius:6px;background:#fff;color:#15171a;outline:none}',
-    '.smw-f input:focus{border-color:var(--ghost-accent-color,#60503e);box-shadow:0 0 0 3px rgba(96,80,62,.12)}',
+    '.smw-lib{width:256px;word-break:keep-all;color:#3d3b37}',
+    '.smw-lib-h{display:flex;justify-content:space-between;align-items:baseline;padding-bottom:12px;border-bottom:1.5px solid #15171a}',
+    '.smw-lib-h b{font-size:12px;font-weight:800;letter-spacing:.12em;color:#15171a}',
+    '.smw-lib-h span{font-size:11px;color:#8a8780}',
+    '.smw-cov{position:relative;container-type:inline-size;aspect-ratio:210/297;width:100%;background:#f4efe7;border-radius:3px;overflow:hidden;box-shadow:0 1px 2px rgba(40,30,20,.08),0 12px 24px -12px rgba(40,30,20,.35)}',
+    '.smw-cov svg{position:absolute;right:-26%;top:-6%;width:86%}',
+    '.smw-cov-t{position:absolute;left:9%;right:9%;top:54%;font-size:10cqw;line-height:1.25;font-weight:900;color:#3a2f25;letter-spacing:-.02em;white-space:pre-line}',
+    '.smw-cov-s{position:absolute;left:9%;right:14%;top:78%;font-size:4.6cqw;line-height:1.55;color:#6d6156;border-left:1.5px solid #e8731a;padding-left:5px}',
+    '.smw-cov-b{position:absolute;left:0;right:0;bottom:0;height:8%;background:#60503e}',
+    '.smw-cov-n{position:absolute;left:9%;top:6%;font-size:5.4cqw;font-weight:800;letter-spacing:.14em;color:#a08d75}',
+    '.smw-feat{padding:18px 0 4px}',
+    '.smw-feat .smw-cov{width:150px;margin:0 auto 4px;transform:rotate(-2deg)}',
+    '.smw-stack{position:relative;width:150px;margin:0 auto}',
+    '.smw-stack::before,.smw-stack::after{content:"";position:absolute;inset:0;background:#fff;border:1px solid #e9e4dc;border-radius:3px}',
+    '.smw-stack::before{transform:rotate(3deg) translate(6px,2px)}',
+    '.smw-stack::after{transform:rotate(1deg) translate(3px,1px)}',
+    '.smw-stack .smw-cov{position:relative;z-index:1}',
+    '.smw-tag{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.08em;color:#c46a1c;margin:16px 0 4px}',
+    '.smw-ft{font-size:17px;line-height:1.4;font-weight:800;color:#15171a;letter-spacing:-.015em;margin:0}',
+    '.smw-hook{font-size:12.5px;line-height:1.65;color:#5f5c56;margin:8px 0 0}',
+    '.smw-pts{list-style:none;margin:12px 0 0;padding:10px 12px;background:#f7f5f1;border-radius:6px}',
+    '.smw-pts-h{font-size:10.5px;font-weight:800;letter-spacing:.06em;color:#8a7a66;margin-bottom:4px}',
+    '.smw-pts li{position:relative;padding-left:14px;font-size:12px;line-height:1.55;color:#3d3b37;margin-top:4px}',
+    '.smw-pts li::before{content:"";position:absolute;left:1px;top:6px;width:7px;height:4px;border-left:1.6px solid #e8731a;border-bottom:1.6px solid #e8731a;transform:rotate(-45deg)}',
+    '.smw-meta2{display:flex;gap:10px;font-size:11px;color:#8a8780;margin-top:10px;font-variant-numeric:tabular-nums}',
+    '.smw-meta2 span+span::before{content:"";display:inline-block;width:3px;height:3px;border-radius:50%;background:#c9c2b6;margin:0 10px 2px 0;vertical-align:middle}',
+    '.smw-more{margin-top:18px;border-top:1px solid #e6e4df}',
+    '.smw-row{all:unset;box-sizing:border-box;display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center;width:100%;padding:10px 0;border-bottom:1px solid #eeece8;cursor:pointer}',
+    '.smw-row .smw-cov{width:34px;border-radius:2px;box-shadow:0 1px 3px rgba(40,30,20,.18)}',
+    '.smw-row .smw-cov-t,.smw-row .smw-cov-s,.smw-row .smw-cov-n{display:none}',
+    '.smw-row b{display:block;font-size:12.5px;line-height:1.4;color:#15171a;font-weight:700}',
+    '.smw-row small{display:block;font-size:10.5px;color:#a3a09a;margin-top:2px}',
+    '.smw-row i{font-style:normal;font-size:12px;color:#c9c2b6}',
+    '.smw-row:hover b,.smw-row:hover i{color:var(--ghost-accent-color,#60503e)}',
+    '.smw-row:focus-visible{outline:2px solid var(--ghost-accent-color,#60503e);outline-offset:2px}',
+    '.smw-row[aria-current="true"]{display:none}',
+    '.smw-all{display:block;text-align:center;margin-top:12px;padding:9px;border:1px solid #dcd8d0;border-radius:6px;font-size:12px;font-weight:700;color:var(--ghost-accent-color,#60503e) !important;text-decoration:none !important}',
+    '.smw-all:hover{background:#f6f4f0}',
+    '.smw-f{margin-top:14px}',
+    '.smw-f-row{display:flex;border:1px solid #cfc9bf;border-radius:7px;background:#fff;overflow:hidden;transition:border-color .15s,box-shadow .15s}',
+    '.smw-f-row:focus-within{border-color:var(--ghost-accent-color,#60503e);box-shadow:0 0 0 3px rgba(96,80,62,.12)}',
+    '.smw-f-row input{flex:1;min-width:0;border:0 !important;box-shadow:none !important;outline:none;font:inherit;font-size:13px;padding:10px 11px;background:transparent;color:#15171a}',
+    '.smw-f-go{all:unset;flex:none;width:40px;display:flex;align-items:center;justify-content:center;background:var(--ghost-accent-color,#60503e);color:#fff;cursor:pointer}',
+    '.smw-f-go:focus-visible{outline:2px solid #15171a;outline-offset:-3px}',
+    '.smw-f[data-open="1"] .smw-f-go{display:none}',
+    '.smw-f-cap{font-size:11px;color:#8a8780;margin-top:6px}',
+    '.smw-f[data-open="1"] .smw-f-cap{display:none}',
     '.smw-f-more{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s ease}',
     '.smw-f[data-open="1"] .smw-f-more{grid-template-rows:1fr}',
     '.smw-f-more>div{overflow:hidden}',
-    '.smw-f-more input{margin-top:6px}',
+    '.smw-f-more input[type=text]{display:block;width:100%;font:inherit;font-size:12.5px;padding:8px 10px;border:1px solid #dcd8d0;border-radius:6px;background:#fff;color:#15171a;outline:none;margin-top:6px}',
+    '.smw-f-more input[type=text]:focus{border-color:var(--ghost-accent-color,#60503e)}',
     '.smw-f-opt{font-size:11px;color:#a3a09a;margin:10px 0 0}',
     '.smw-f label.ck{display:grid;grid-template-columns:16px 1fr;gap:6px;align-items:start;font-size:11.5px;line-height:1.5;color:#5f5c56;margin-top:8px;cursor:pointer}',
     '.smw-f label.ck input{margin:2px 0 0;accent-color:var(--ghost-accent-color,#60503e)}',
     '.smw-f label.ck b{font-weight:800;color:#15171a}',
-    '.smw-f details{font-size:11px;color:#8a8780;margin:4px 0 0 22px}',
+    '.smw-f details{font-size:11px;color:#8a8780;margin:3px 0 0 22px}',
     '.smw-f summary{cursor:pointer;color:#a3a09a}',
     '.smw-f details p{margin:4px 0 0;line-height:1.55}',
-    '.smw-f button{all:unset;box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:6px;width:100%;margin-top:10px;padding:10px 12px;border-radius:6px;background:var(--ghost-accent-color,#60503e);color:#fff;font-size:13px;font-weight:800;cursor:pointer;text-align:center}',
-    '.smw-f button:hover{filter:brightness(1.12)}',
-    '.smw-f button:focus-visible{outline:2px solid #15171a;outline-offset:2px}',
-    '.smw-f button[disabled]{opacity:.6;cursor:default}',
+    '.smw-f-submit{all:unset;box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:6px;width:100%;margin-top:12px;padding:11px 12px;border-radius:7px;background:var(--ghost-accent-color,#60503e);color:#fff;font-size:13px;font-weight:800;cursor:pointer}',
+    '.smw-f-submit:hover{filter:brightness(1.12)}',
+    '.smw-f-submit:focus-visible{outline:2px solid #15171a;outline-offset:2px}',
+    '.smw-f-submit[disabled]{opacity:.6;cursor:default}',
+    '.smw-f[data-open="0"] .smw-f-submit{display:none}',
     '.smw-f-msg{font-size:12px;line-height:1.55;margin-top:8px;color:#b2412f}',
-    '.smw-f-ok{font-size:12.5px;line-height:1.6;margin-top:12px;padding:12px;border-radius:6px;background:#f6f4f0;color:#3d3b37}',
+    '.smw-f-ok{font-size:12.5px;line-height:1.6;margin-top:14px;padding:12px;border-radius:7px;background:#f7f5f1;color:#3d3b37}',
     '.smw-f-ok b{display:block;color:#15171a;margin-bottom:2px}',
+    '.smw-get{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:14px;padding:11px 12px;border-radius:7px;background:var(--ghost-accent-color,#60503e);color:#fff !important;font-size:13px;font-weight:800;text-decoration:none !important}',
+    /* 자료실 전체 페이지 */
+    '.smw-libpage{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:40px 28px}',
+    '.smw-card2 .smw-cov{width:72%}',
+    '.smw-card2{display:flex;flex-direction:column}',
+    '.smw-card2 .smw-cov{margin-bottom:14px}',
+    '.smw-card2 .smw-ft{font-size:16px}',
+    '.smw-card2 .smw-f{margin-top:auto;padding-top:14px}',
     '.smw-post .smw-band{margin:0}',
     '@media (prefers-reduced-motion:reduce){.smw-body,.smw-chev{transition:none}.smw-track{animation:none}.smw-tick{overflow-x:auto}}'
   ].join('\n');
@@ -485,32 +525,80 @@
       .then(function (r) { member = r.status === 200; })
       .catch(function () { member = false; });
   }
-  function renderLib(lib) {
+  var ORBIT = '<svg viewBox="0 0 400 400" aria-hidden="true"><circle cx="200" cy="200" r="190" fill="none" stroke="#60503e" stroke-opacity=".16"/><circle cx="200" cy="200" r="140" fill="none" stroke="#60503e" stroke-opacity=".22"/><circle cx="200" cy="200" r="90" fill="none" stroke="#60503e" stroke-opacity=".3"/><circle cx="200" cy="200" r="54" fill="#f7a23b" fill-opacity=".35"/><circle cx="200" cy="200" r="24" fill="#e8731a"/></svg>';
+  function cover(g) {
+    var c = h('div', 'smw-cov'); c.innerHTML = ORBIT;
+    c.appendChild(h('div', 'smw-cov-n', g.no || ''));
+    c.appendChild(h('div', 'smw-cov-t', g.cover || g.title));
+    if (g.coverSub) c.appendChild(h('div', 'smw-cov-s', g.coverSub));
+    c.appendChild(h('div', 'smw-cov-b'));
+    return c;
+  }
+  function action(g, lib) {
+    if (member) {
+      var a = h('a', 'smw-get');
+      a.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M6 11l6 6 6-6M5 20h14"/></svg>';
+      a.appendChild(document.createTextNode('바로 받기')); a.href = g.url; return a;
+    }
+    return guideForm(g, lib);
+  }
+  function featured(g, lib) {
+    var w = h('div', 'smw-feat');
+    var st = h('div', 'smw-stack'); st.appendChild(cover(g)); w.appendChild(st);
+    w.appendChild(h('div', 'smw-tag', (g.isNew ? 'NEW · ' : '') + (g.no || '')));
+    w.appendChild(h('h3', 'smw-ft', g.title));
+    if (g.hook) w.appendChild(h('p', 'smw-hook', g.hook));
+    if (g.points && g.points.length) {
+      var ul = h('ul', 'smw-pts'); ul.appendChild(h('div', 'smw-pts-h', '이런 내용이 들어 있습니다'));
+      g.points.forEach(function (x) { ul.appendChild(h('li', '', x)); });
+      w.appendChild(ul);
+    }
+    if (g.meta) { var m = h('div', 'smw-meta2'); g.meta.split('·').forEach(function (x) { m.appendChild(h('span', '', x.trim())); }); w.appendChild(m); }
+    w.appendChild(action(g, lib));
+    return w;
+  }
+  function renderLib(lib, max) {
+    max = max || 4;
+    var list = lib.guides || [];
     var box = h('aside', 'smw smw-lib');
     box.setAttribute('aria-label', lib.title || '자료실');
-    var head = h('div', 'smw-lib-h'); head.appendChild(h('span', '', lib.title || '자료실'));
-    var list = lib.guides || [];
-    if (list.length > 3 && lib.all) { var all = h('a', '', '전체 보기 →'); all.href = lib.all; head.appendChild(all); }
+    var head = h('div', 'smw-lib-h'); head.appendChild(h('b', '', 'SOLARIS 자료실'));
+    head.appendChild(h('span', '', '무료 가이드 ' + list.length + '종'));
     box.appendChild(head);
-    list.slice(0, 3).forEach(function (g) {
-      var it = h('div', 'smw-g');
-      var cv = h('div', 'smw-g-cover'); cv.appendChild(h('div', 'smw-g-no', g.no || 'GUIDE'));
-      cv.appendChild(h('div', 'smw-g-ct', g.title)); it.appendChild(cv);
-      it.appendChild(h('p', 'smw-g-desc', g.desc));
-      if (g.meta) it.appendChild(h('div', 'smw-g-meta', g.meta));
-      if (member) {
-        var btn = h('a', 'smw-g-btn');
-        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M6 11l6 6 6-6M5 20h14"/></svg>';
-        btn.appendChild(document.createTextNode('바로 받기'));
-        btn.href = g.url;
-        it.appendChild(btn);
-      } else {
-        it.appendChild(guideForm(g, lib));
-      }
-      box.appendChild(it);
-    });
-    if (member) box.appendChild(h('div', 'smw-lib-note', '이미 이메일을 등록하셔서 바로 받을 수 있습니다.'));
+    var slot = h('div'); box.appendChild(slot);
+    var rows = [];
+    function show(i) {
+      slot.innerHTML = ''; slot.appendChild(featured(list[i], lib));
+      rows.forEach(function (r) { r.setAttribute('aria-current', r.dataset.i == i ? 'true' : 'false'); });
+    }
+    if (list.length > 1) {
+      var more = h('div', 'smw-more');
+      list.slice(0, max).forEach(function (g, i) {
+        var r = h('button', 'smw-row'); r.type = 'button'; r.dataset.i = i;
+        r.appendChild(cover(g));
+        var tx = h('span'); tx.appendChild(h('b', '', g.title)); if (g.meta) tx.appendChild(h('small', '', g.meta)); r.appendChild(tx);
+        r.appendChild(h('i', '', '→'));
+        r.addEventListener('click', function () { show(i); box.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); });
+        rows.push(r); more.appendChild(r);
+      });
+      box.appendChild(more);
+      if (list.length > max - 0 && lib.all) { var all = h('a', 'smw-all', '자료 ' + list.length + '종 전체 보기 →'); all.href = lib.all; box.appendChild(all); }
+    }
+    if (list.length) show(0);
     return box;
+  }
+  function renderLibPage(lib) {
+    var grid = h('div', 'smw smw-libpage');
+    (lib.guides || []).forEach(function (g) {
+      var c = h('article', 'smw-card2'); c.appendChild(cover(g));
+      c.appendChild(h('div', 'smw-tag', (g.isNew ? 'NEW · ' : '') + (g.no || '')));
+      c.appendChild(h('h3', 'smw-ft', g.title));
+      if (g.hook) c.appendChild(h('p', 'smw-hook', g.hook));
+      if (g.meta) c.appendChild(h('div', 'smw-meta2', g.meta));
+      c.appendChild(action(g, lib));
+      grid.appendChild(c);
+    });
+    return grid;
   }
   function field(type, ph, name) {
     var i = h('input'); i.type = type; i.placeholder = ph; i.name = name; i.autocomplete = name === 'email' ? 'email' : name === 'name' ? 'name' : name === 'company' ? 'organization' : 'organization-title';
@@ -522,7 +610,13 @@
   }
   function guideForm(g, lib) {
     var f = h('form', 'smw-f'); f.noValidate = true; f.dataset.open = '0';
-    var em = field('email', '이메일 주소', 'email'); f.appendChild(em);
+    var em = field('email', '이메일 주소를 입력하세요', 'email');
+    var row = h('div', 'smw-f-row'); row.appendChild(em);
+    var go = h('button', 'smw-f-go'); go.type = 'button'; go.setAttribute('aria-label', '받기');
+    go.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+    row.appendChild(go); f.appendChild(row);
+    f.appendChild(h('div', 'smw-f-cap', '이메일로 바로 보내 드립니다. 무료입니다.'));
+    go.addEventListener('click', function () { f.dataset.open = '1'; em.focus(); });
     var more = h('div', 'smw-f-more'), mi = h('div');
     mi.appendChild(h('div', 'smw-f-opt', '아래는 선택 항목입니다. 비워도 받을 수 있습니다.'));
     var nm = field('text', '이름 (선택)', 'name'), co = field('text', '회사 (선택)', 'company'), ti = field('text', '직급 (선택)', 'title');
@@ -540,7 +634,7 @@
     var d3 = h('details'); d3.innerHTML = '<summary>내용 보기</summary><p>새 글과 세미나·자료 안내를 이메일로 보냅니다. 메일 하단 링크로 언제든 수신을 끊을 수 있습니다. 동의하지 않아도 자료를 받을 수 있습니다.</p>';
     mi.appendChild(d3);
     more.appendChild(mi); f.appendChild(more);
-    var bt = h('button'); bt.type = 'submit';
+    var bt = h('button', 'smw-f-submit'); bt.type = 'submit';
     bt.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16v12H4zM4 7l8 6 8-6"/></svg>';
     bt.appendChild(document.createTextNode('이메일로 받기'));
     f.appendChild(bt);
@@ -672,8 +766,8 @@
       card.style.position = ch + 48 < window.innerHeight ? 'sticky' : 'static';
       if (state.left) {
         state.left.style.top = top + 'px';
-        state.left.style.left = (r.left + window.pageXOffset - GAP - 240) + 'px';
-        state.left.style.display = r.left >= 240 + GAP + 24 ? '' : 'none';
+        state.left.style.left = (r.left + window.pageXOffset - GAP - 256) + 'px';
+        state.left.style.display = r.left >= 256 + GAP + 24 ? '' : 'none';
       }
     }
   }
@@ -711,7 +805,7 @@
       .catch(function () { /* 데이터를 못 읽으면 아무것도 띄우지 않음 */ });
   }
 
-  window.SolarisMarketWidget = { renderLib: renderLib, renderCard: renderCard, renderBand: renderBand, renderStrip: renderStrip, injectCss: injectCss };
+  window.SolarisMarketWidget = { renderLib: renderLib, renderLibPage: renderLibPage, renderCard: renderCard, renderBand: renderBand, renderStrip: renderStrip, injectCss: injectCss };
   if (!CFG.manual) {
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
     else boot();
