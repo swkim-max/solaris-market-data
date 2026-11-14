@@ -196,13 +196,31 @@
     '.smw-f-ok{font-size:12.5px;line-height:1.6;margin-top:14px;padding:12px;border-radius:7px;background:#f7f5f1;color:#3d3b37}',
     '.smw-f-ok b{display:block;color:#15171a;margin-bottom:2px}',
     '.smw-get{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:14px;padding:11px 12px;border-radius:7px;background:var(--ghost-accent-color,#60503e);color:#fff !important;font-size:13px;font-weight:800;text-decoration:none !important}',
-    '.smw-lib-c{width:232px}',
-    '.smw-lib-c .smw-feat{padding-top:16px}',
-    '.smw-lib-c .smw-stack{width:104px}',
+    '.smw-lib-c{width:200px}',
+    '.smw-lib-c .smw-lib-h{padding-bottom:9px}',
+    '.smw-lib-c .smw-lib-h b{font-size:11px}',
+    '.smw-lib-c .smw-lib-h span{font-size:10px}',
+    '.smw-lib-c .smw-feat{padding-top:14px}',
+    '.smw-lib-c .smw-stack{width:78px;margin:0}',
     '.smw-lib-c .smw-pts{display:none}',
-    '.smw-lib-c .smw-ft{font-size:15px}',
-    '.smw-lib-c .smw-hook{font-size:12px}',
-    '.smw-lib-c .smw-tag{margin-top:14px}',
+    '.smw-lib-c .smw-tag{margin-top:12px;font-size:9.5px}',
+    '.smw-lib-c .smw-ft{font-size:13.5px}',
+    '.smw-lib-c .smw-hook{font-size:11.5px;line-height:1.6;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}',
+    '.smw-lib-c .smw-meta2{font-size:10.5px;margin-top:8px}',
+    '.smw-lib-c .smw-f-row input{height:36px !important;line-height:36px !important;font-size:12px !important}',
+    '.smw-lib-c .smw-f-go{width:36px}',
+    '.smw-lib-c .smw-f-cap{font-size:10.5px}',
+    /* 포스트 본문 끝 카드 (모바일 등) */
+    '.smw-end{margin:40px 0 8px}',
+    '.smw-libend{border:1px solid #e6e4df;border-radius:12px;padding:18px 18px 16px;background:#fbfaf8;word-break:keep-all}',
+    '.smw-libend .smw-lib-h{border-bottom-width:1px}',
+    '.smw-libend-row{display:grid;grid-template-columns:72px 1fr;gap:14px;align-items:start;margin-top:14px}',
+    '.smw-libend-row .smw-cov{width:72px;box-shadow:0 1px 2px rgba(40,30,20,.08),0 8px 16px -10px rgba(40,30,20,.4)}',
+    '.smw-libend-row .smw-cov-t{font-size:9.5cqw}',
+    '.smw-libend .smw-tag{margin:0 0 3px}',
+    '.smw-libend .smw-ft{font-size:15.5px}',
+    '.smw-libend .smw-meta2{margin-top:6px}',
+    '.smw-libend .smw-hook{font-size:13px;margin-top:12px}',
     /* 자료실 전체 페이지 */
     '.smw-libpage{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:40px 28px}',
     '.smw-card2 .smw-cov{width:72%}',
@@ -610,6 +628,19 @@
     if (list.length) show(0);
     return box;
   }
+  function renderEnd(lib) {
+    var g = (lib.guides || [])[0]; if (!g) return null;
+    var box = h('aside', 'smw smw-libend'); box.setAttribute('aria-label', '무료 가이드');
+    var head = h('div', 'smw-lib-h'); head.appendChild(h('b', '', 'SOLARIS 자료실')); head.appendChild(h('span', '', '무료 가이드')); box.appendChild(head);
+    var row = h('div', 'smw-libend-row'); row.appendChild(cover(g));
+    var tx = h('div'); tx.appendChild(h('div', 'smw-tag', (g.isNew ? 'NEW · ' : '') + (g.no || ''))); tx.appendChild(h('h3', 'smw-ft', g.title));
+    if (g.meta) { var m = h('div', 'smw-meta2'); g.meta.split('·').forEach(function (x) { m.appendChild(h('span', '', x.trim())); }); tx.appendChild(m); }
+    row.appendChild(tx); box.appendChild(row);
+    if (g.hook) box.appendChild(h('p', 'smw-hook', g.hook));
+    box.appendChild(action(g, lib));
+    if ((lib.guides || []).length > 1 && lib.all) { var al = h('a', 'smw-all', '자료 ' + lib.guides.length + '종 모두 보기 →'); al.href = lib.all; box.appendChild(al); }
+    return box;
+  }
   function renderLibPage(lib) {
     var grid = h('div', 'smw smw-libpage');
     (lib.guides || []).forEach(function (g) {
@@ -732,14 +763,23 @@
     }
     placePostLib();
   }
-  var LIB_C_W = 232;
+  var LIB_C_W = 200;
   function placePostLib() {
     var body = document.querySelector('.gh-content');
-    var ok = LIB_POST_ON && state.lib && (state.lib.guides || []).length && body;
-    var first = ok && body.querySelector(':scope > p, :scope > h2, :scope > h3, :scope > ul, :scope > ol, :scope > blockquote');
+    var has = LIB_POST_ON && state.lib && (state.lib.guides || []).length && body;
+    if (!has) return;
+    var first = body.querySelector(':scope > p, :scope > h2, :scope > h3, :scope > ul, :scope > ol, :scope > blockquote');
     var cr = first ? first.getBoundingClientRect() : null;
     var fit = cr && window.innerWidth >= MIN_DESKTOP && cr.left >= LIB_C_W + GAP + 24;
-    if (!fit) { if (state.left) { state.left.remove(); state.left = null; } return; }
+    if (!fit) {
+      if (state.left) { state.left.remove(); state.left = null; }
+      if (!state.end) {
+        var card = renderEnd(state.lib);
+        if (card) { state.end = h('div', 'gh-canvas smw-end'); state.end.appendChild(card); body.parentNode.insertBefore(state.end, body.nextSibling); }
+      }
+      return;
+    }
+    if (state.end) { state.end.remove(); state.end = null; }
     if (!state.left) {
       state.left = h('div', 'smw-lrail');
       state.left.appendChild(renderLib(state.lib, 1, true));
@@ -749,9 +789,13 @@
     var top = br.top + window.pageYOffset + 8;
     var endEl = document.querySelector('.single-footer') || body;
     var bottom = endEl.getBoundingClientRect().top + window.pageYOffset;
-    var gap = Math.max(GAP, Math.min(96, cr.left - LIB_C_W - 32));
+    /* 대표 이미지(넓은 이미지)의 왼쪽 끝보다 바깥에 두고, 자리가 없으면 화면 왼쪽 여백에 붙인다 */
+    var media = document.querySelector('.single-media');
+    var ml = media ? media.getBoundingClientRect().left : cr.left;
+    var right = (ml - 32 - LIB_C_W >= 32) ? ml - 32 : 32 + LIB_C_W;
+    right = Math.min(right, cr.left - GAP);
     state.left.style.top = top + 'px';
-    state.left.style.left = (cr.left + window.pageXOffset - gap - LIB_C_W) + 'px';
+    state.left.style.left = (right - LIB_C_W + window.pageXOffset) + 'px';
     var inner = state.left.firstChild, ih = inner.offsetHeight;
     state.left.style.height = Math.max(bottom - top, ih) + 'px';
     inner.style.position = ih + 48 < window.innerHeight ? 'sticky' : 'static';
