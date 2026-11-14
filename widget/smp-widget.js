@@ -9,6 +9,7 @@
   var CARD_W = 256;
   var C_SMP = '#2563a8', C_SMP_LAST = '#f28c18', C_JKM = '#e8731a', C_ORANGE = '#ff9a1f', C_JEJU = '#14a37f', C_OIL = '#6b4f2e', C_UP = '#d33a2c', C_DOWN = '#2563a8', C_TTF = '#7c5cc4', C_HH = '#2f8f6b';
   var GAP = 48;
+  var POSTS_DEFAULT = false;
 
   var CSS = [
     '.smw{font-family:inherit;color:#15171a;-webkit-font-smoothing:antialiased;box-sizing:border-box}',
@@ -83,6 +84,17 @@
     '.smw-band .smw-tick{padding:13px 0;min-width:0}',
     '.smw-band .smw-chev{background:#2a2622}',
     '.smw-band .smw-chev path{stroke:'+C_ORANGE+'}',
+    /* 포스트 상단 띠 (PC) */
+    '.smw-strip{display:flex;align-items:stretch;height:38px;background:#0e0e0f;color:#e9e6df;text-decoration:none !important;border-bottom:1px solid #000}',
+    '.smw-strip-lbl{flex:none;display:flex;align-items:center;gap:8px;padding:0 18px 0 24px;font-size:11.5px;font-weight:800;letter-spacing:.04em;color:#fff;border-right:1px solid #2a2622;white-space:nowrap}',
+    '.smw-strip-lbl i{width:7px;height:7px;border-radius:2px;background:'+C_ORANGE+';box-shadow:0 0 6px rgba(255,154,31,.6)}',
+    '.smw-strip .smw-tick{flex:1;min-width:0;display:flex;align-items:center;padding:0}',
+    '.smw-strip .smw-item{font-size:12.5px}',
+    '.smw-strip-go{flex:none;display:flex;align-items:center;padding:0 24px 0 18px;font-size:12px;font-weight:700;color:'+C_ORANGE+';border-left:1px solid #2a2622;white-space:nowrap}',
+    'a.smw-strip:hover .smw-strip-go{text-decoration:underline}',
+    'a.smw-strip:focus-visible{outline:2px solid '+C_ORANGE+';outline-offset:-2px}',
+    '.smw-post{padding-top:16px}',
+    '.smw-post .smw-band{margin:0}',
     '@media (prefers-reduced-motion:reduce){.smw-body,.smw-chev{transition:none}.smw-track{animation:none}.smw-tick{overflow-x:auto}}'
   ].join('\n');
 
@@ -393,6 +405,33 @@
     return band;
   }
 
+  function renderStrip(d) {
+    var s = summarize(d);
+    var el = h(LINK ? 'a' : 'div', 'smw smw-strip');
+    if (LINK) { el.href = LINK; el.setAttribute('aria-label', '전력·가스 시세 전체 보기'); }
+    var lbl = h('span', 'smw-strip-lbl'); lbl.appendChild(h('i')); lbl.appendChild(document.createTextNode('이번 주 전력·가스 시세'));
+    el.appendChild(lbl);
+    el.appendChild(ticker(s));
+    if (LINK) el.appendChild(h('span', 'smw-strip-go', '전체 보기 →'));
+    return el;
+  }
+
+  /* ---------- 포스트에 붙이기 ---------- */
+  var POST_MIN = CFG.postStripMin || 768;
+  function placePost() {
+    if (!state.data) return;
+    var head = document.querySelector('.gh-head') || document.querySelector('header');
+    if (!head) return;
+    var mode = window.innerWidth >= POST_MIN ? 'strip' : 'band';
+    if (mode === state.mode) return;
+    if (state.el) state.el.remove();
+    var el;
+    if (mode === 'strip') el = renderStrip(state.data);
+    else { el = h('div', 'gh-canvas smw-post'); el.appendChild(renderBand(state.data)); }
+    head.parentNode.insertBefore(el, head.nextSibling);
+    state.el = el; state.mode = mode;
+  }
+
   /* ---------- 블로그에 붙이기 ---------- */
   function findFeed() {
     var gh = document.querySelector('.feed-header');
@@ -458,20 +497,23 @@
 
   function boot() {
     if (!DATA_URL) return;
-    if (CFG.homeOnly !== false && !document.body.classList.contains('home-template')) return;
-    if (CFG.preview) {
-      var on = /[?&]smw=preview\b/.test(location.search);
-      try { if (on) sessionStorage.setItem('smw-preview', '1'); else on = sessionStorage.getItem('smw-preview') === '1'; } catch (e) {}
-      if (!on) return;
-    }
+    var on = /[?&]smw=preview\b/.test(location.search);
+    try { if (on) sessionStorage.setItem('smw-preview', '1'); else on = sessionStorage.getItem('smw-preview') === '1'; } catch (e) {}
+    var cls = document.body.classList;
+    var isHome = cls.contains('home-template');
+    /* 포스트 띠: 확정 전까지는 미리보기에서만 보임 */
+    var isPost = cls.contains('post-template') && (CFG.posts === true || POSTS_DEFAULT || on);
+    if (!isHome && !isPost && CFG.homeOnly !== false) return;
+    if (CFG.preview && !on) return;
+    var placer = isHome ? place : placePost;
     injectCss();
     fetch(DATA_URL, { cache: 'no-cache' })
       .then(function (res) { if (!res.ok) throw new Error(res.status); return res.json(); })
       .then(function (d) {
         state.data = d;
-        try { place(); } catch (e) { if (state.el) state.el.remove(); return; }
+        try { placer(); } catch (e) { if (state.el) state.el.remove(); return; }
         var t;
-        var safe = function () { try { place(); } catch (e) {} };
+        var safe = function () { try { placer(); } catch (e) {} };
         window.addEventListener('resize', function () { clearTimeout(t); t = setTimeout(safe, 120); });
         window.addEventListener('load', safe);
       })
