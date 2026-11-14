@@ -10,6 +10,8 @@
   var C_SMP = '#2563a8', C_SMP_LAST = '#f28c18', C_JKM = '#e8731a', C_ORANGE = '#ff9a1f', C_JEJU = '#14a37f', C_OIL = '#6b4f2e', C_UP = '#d33a2c', C_DOWN = '#2563a8', C_TTF = '#7c5cc4', C_HH = '#2f8f6b';
   var GAP = 48;
   var POSTS_DEFAULT = true;
+  var LEFT_DEFAULT = false;
+  var LEFT_ON = false;
 
   var CSS = [
     '.smw{font-family:inherit;color:#15171a;-webkit-font-smoothing:antialiased;box-sizing:border-box}',
@@ -115,6 +117,23 @@
     '.t-light .smw-item .up{color:#d33a2c}.t-light .smw-item .down{color:#2563a8}',
     '.t-light .smw-sep{color:#c9c4bb}',
     '.smw-post{padding-top:16px}',
+    /* 왼쪽 소개 칸 */
+    '.smw-left{width:240px;word-break:keep-all;font-size:13px;line-height:1.65;color:#3d3b37}',
+    '.smw-l-eyebrow{font-size:11px;font-weight:800;letter-spacing:.06em;color:var(--ghost-accent-color,#60503e);padding-bottom:10px;border-bottom:1px solid #e6e4df}',
+    '.smw-l-h{font-size:17px;line-height:1.45;font-weight:800;color:#15171a;margin:14px 0 8px;letter-spacing:-.01em}',
+    '.smw-l-p{margin:0 0 16px;color:#5f5c56}',
+    '.smw-l-list{list-style:none;margin:0;padding:0;border-top:1px solid #eeece8}',
+    '.smw-l-list li{border-bottom:1px solid #eeece8}',
+    '.smw-l-list a{display:block;padding:10px 0;text-decoration:none !important;color:inherit}',
+    '.smw-l-list b{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:#15171a}',
+    '.smw-l-list b::after{content:"→";font-weight:400;color:#b0aca4;transition:transform .15s,color .15s}',
+    '.smw-l-list a:hover b::after{transform:translateX(3px);color:var(--ghost-accent-color,#60503e)}',
+    '.smw-l-list span{display:block;font-size:12px;color:#8a8780;margin-top:2px;line-height:1.55}',
+    '.smw-l-cta{display:flex;align-items:center;justify-content:center;margin-top:18px;padding:10px 12px;border-radius:6px;background:var(--ghost-accent-color,#60503e);color:#fff !important;font-size:13px;font-weight:800;text-decoration:none !important}',
+    '.smw-l-cta:hover{filter:brightness(1.1)}',
+    '.smw-l-contact{font-size:12px;color:#8a8780;margin-top:10px;line-height:1.7;font-variant-numeric:tabular-nums}',
+    '.smw-l-contact a{color:inherit !important;text-decoration:none !important}',
+    '.smw-lrail{position:absolute;z-index:5}',
     '.smw-post .smw-band{margin:0}',
     '@media (prefers-reduced-motion:reduce){.smw-body,.smw-chev{transition:none}.smw-track{animation:none}.smw-tick{overflow-x:auto}}'
   ].join('\n');
@@ -438,6 +457,45 @@
     return el;
   }
 
+  var ABOUT = CFG.about || {
+    eyebrow: '법률사무소 솔라리스 재생에너지팀',
+    title: '재생에너지 사업의 법률 문제를 처음부터 끝까지 다룹니다',
+    text: '부지 확보와 인허가부터 발전소 매매, 자금 조달, 건설·운영, 분쟁까지 사업의 단계마다 필요한 자문을 한 팀이 맡습니다.',
+    areas: [
+      ['인허가·규제', '발전사업허가, 개발행위허가, 출력제어 등 규제 대응', '/tag/regulation/'],
+      ['M&A·금융', '발전소 양수도, 법률 실사, 프로젝트 파이낸싱', '/tag/merger/'],
+      ['소송·분쟁', '한전 계약, 분양사기, 시공·운영 분쟁', '/tag/litigation/'],
+      ['정책·동향', 'RPS, PPA, ESS 입찰 등 제도 변화 해설', '/tag/insight/']
+    ],
+    cta: ['상담 문의하기', '/contact/'],
+    phone: '02-6001-2903',
+    email: 'info@solarislaw.net'
+  };
+  function renderLeft() {
+    var a = ABOUT;
+    var box = h('aside', 'smw smw-left');
+    box.setAttribute('aria-label', '솔라리스 소개');
+    box.appendChild(h('div', 'smw-l-eyebrow', a.eyebrow));
+    box.appendChild(h('div', 'smw-l-h', a.title));
+    box.appendChild(h('p', 'smw-l-p', a.text));
+    var ul = h('ul', 'smw-l-list');
+    a.areas.forEach(function (it) {
+      var li = h('li'), link = h('a');
+      link.href = it[2];
+      link.appendChild(h('b', '', it[0]));
+      link.appendChild(h('span', '', it[1]));
+      li.appendChild(link); ul.appendChild(li);
+    });
+    box.appendChild(ul);
+    var cta = h('a', 'smw-l-cta', a.cta[0]); cta.href = a.cta[1]; box.appendChild(cta);
+    var c = h('div', 'smw-l-contact');
+    var tel = h('a', '', 'T. ' + a.phone); tel.href = 'tel:' + a.phone.replace(/-/g, '');
+    var em = h('a', '', 'E. ' + a.email); em.href = 'mailto:' + a.email;
+    c.appendChild(tel); c.appendChild(h('br')); c.appendChild(em);
+    box.appendChild(c);
+    return box;
+  }
+
   /* ---------- 포스트에 붙이기 ---------- */
   var POST_MIN = CFG.postStripMin || 768;
   function placePost() {
@@ -491,7 +549,9 @@
     var mode = wantCard ? 'card' : 'band';
     if (mode !== state.mode) {
       if (state.el) state.el.remove();
+      if (state.left) { state.left.remove(); state.left = null; }
       if (mode === 'card') {
+        if (LEFT_ON) { state.left = h('div', 'smw-lrail'); state.left.appendChild(renderLeft()); document.body.appendChild(state.left); }
         var rail = h('div', 'smw-rail');
         rail.appendChild(renderCard(state.data));
         document.body.appendChild(rail);
@@ -514,6 +574,11 @@
       var ch = card.offsetHeight;
       state.el.style.height = Math.max(r.bottom + window.pageYOffset - top, ch) + 'px';
       card.style.position = ch + 48 < window.innerHeight ? 'sticky' : 'static';
+      if (state.left) {
+        state.left.style.top = top + 'px';
+        state.left.style.left = (r.left + window.pageXOffset - GAP - 240) + 'px';
+        state.left.style.display = r.left >= 240 + GAP + 24 ? '' : 'none';
+      }
     }
   }
 
@@ -527,6 +592,7 @@
     var isPost = cls.contains('post-template') && (CFG.posts === true || POSTS_DEFAULT || on);
     if (!isHome && !isPost && CFG.homeOnly !== false) return;
     if (CFG.preview && !on) return;
+    LEFT_ON = CFG.left === true || LEFT_DEFAULT || on;
     var placer = isHome ? place : placePost;
     injectCss();
     fetch(DATA_URL, { cache: 'no-cache' })
@@ -542,7 +608,7 @@
       .catch(function () { /* 데이터를 못 읽으면 아무것도 띄우지 않음 */ });
   }
 
-  window.SolarisMarketWidget = { renderCard: renderCard, renderBand: renderBand, injectCss: injectCss };
+  window.SolarisMarketWidget = { renderCard: renderCard, renderBand: renderBand, renderLeft: renderLeft, renderStrip: renderStrip, injectCss: injectCss };
   if (!CFG.manual) {
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
     else boot();
