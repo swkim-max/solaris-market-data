@@ -326,6 +326,11 @@
 
   /* ---------- 블로그에 붙이기 ---------- */
   function findFeed() {
+    var gh = document.querySelector('.feed-header');
+    if (gh) {
+      var wrap = gh.querySelector('.feed-header-wrapper') || gh;
+      return { heading: gh, column: wrap, ghost: true };
+    }
     if (CFG.feedSelector) {
       var el = document.querySelector(CFG.feedSelector);
       if (el) return { heading: el, column: el };
@@ -363,14 +368,16 @@
         state.el = rail;
       } else {
         var band = renderBand(state.data);
-        f.heading.parentNode.insertBefore(band, f.heading);
-        state.el = band;
+        var holder = band;
+        if (f.ghost) { holder = h('div', 'gh-canvas smw-holder'); holder.appendChild(band); }
+        f.heading.parentNode.insertBefore(holder, f.heading);
+        state.el = holder;
       }
       state.mode = mode;
     }
     if (mode === 'card') {
-      var hb = f.heading.getBoundingClientRect();
-      var top = (f.heading !== f.column ? hb.bottom + 24 : r.top) + window.pageYOffset;
+      var hb = (f.ghost ? f.column : f.heading).getBoundingClientRect();
+      var top = hb.bottom + 24 + window.pageYOffset;
       state.el.style.left = (r.right + window.pageXOffset + GAP) + 'px';
       state.el.style.top = top + 'px';
       var card = state.el.firstChild;
@@ -393,10 +400,11 @@
       .then(function (res) { if (!res.ok) throw new Error(res.status); return res.json(); })
       .then(function (d) {
         state.data = d;
-        place();
+        try { place(); } catch (e) { if (state.el) state.el.remove(); return; }
         var t;
-        window.addEventListener('resize', function () { clearTimeout(t); t = setTimeout(place, 120); });
-        window.addEventListener('load', place);
+        var safe = function () { try { place(); } catch (e) {} };
+        window.addEventListener('resize', function () { clearTimeout(t); t = setTimeout(safe, 120); });
+        window.addEventListener('load', safe);
       })
       .catch(function () { /* 데이터를 못 읽으면 아무것도 띄우지 않음 */ });
   }
