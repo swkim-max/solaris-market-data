@@ -545,7 +545,9 @@
     if (member) {
       var a = h('a', 'smw-get');
       a.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M6 11l6 6 6-6M5 20h14"/></svg>';
-      a.appendChild(document.createTextNode('바로 받기')); a.href = g.url; return a;
+      a.appendChild(document.createTextNode('PDF 바로 받기'));
+      if (g.file) { a.href = g.file; a.setAttribute('download', ''); } else a.href = g.url;
+      return a;
     }
     return guideForm(g, lib);
   }
@@ -656,7 +658,7 @@
       if (!c1[1].checked) { msg.textContent = '필수 항목인 개인정보 수집·이용에 동의해 주세요.'; return; }
       var clip = function (v) { return v.trim().replace(/\s+/g, ' ').slice(0, 40); };
       var labels = [g.no || 'GUIDE'];
-      var body = { email: email, emailType: 'signup', labels: labels, newsletters: [] };
+      var body = { email: email, emailType: 'signup', labels: labels, newsletters: [], autoRedirect: true, redirect: location.origin + g.url };
       if (c2[1].checked) {
         if (clip(nm.value)) body.name = clip(nm.value);
         if (clip(co.value)) labels.push('회사: ' + clip(co.value));
@@ -675,7 +677,7 @@
         .then(function (r) {
           if (!r.ok) throw new Error(r.status);
           var ok = h('div', 'smw-f-ok'); ok.appendChild(h('b', '', '메일함을 확인해 주세요'));
-          ok.appendChild(document.createTextNode(email + '로 보낸 확인 메일의 링크를 누르면 다운로드 페이지가 열립니다. 메일이 보이지 않으면 스팸함도 확인해 주세요.'));
+          ok.appendChild(document.createTextNode(email + '로 메일을 보냈습니다. 메일의 버튼을 누르면 바로 다운로드가 시작됩니다. 메일이 보이지 않으면 스팸함도 확인해 주세요.'));
           f.replaceWith(ok);
         })
         .catch(function () { bt.disabled = false; msg.textContent = '전송하지 못했습니다. 잠시 뒤 다시 시도하거나 info@solarislaw.net으로 요청해 주세요.'; });
