@@ -556,8 +556,26 @@
   var member = null;
   function checkMember() {
     return fetch('/members/api/member/', { credentials: 'same-origin' })
-      .then(function (r) { member = r.status === 200; })
+      .then(function (r) { member = r.status === 200; return member ? r.json() : null; })
+      .then(function (m) { if (m && m.email) memberInfo = { email: m.email, name: m.name || '' }; })
       .catch(function () { member = false; });
+  }
+  var memberInfo = null;
+  /* 한 번 신청한 방문자는 이 브라우저에 이메일을 기억해 두고 다음 자료부터 바로 받게 한다 */
+  function knownLead() {
+    try { var s = JSON.parse(localStorage.getItem('smw-lead') || 'null'); if (s && s.email) return s; } catch (e) {}
+    if (memberInfo) return { email: memberInfo.email, name: memberInfo.name, company: '', title: '', extra: memberInfo.name ? '동의' : '미동의', news: '기존 구독자' };
+    return null;
+  }
+  function saveLead(rec) {
+    try { localStorage.setItem('smw-lead', JSON.stringify({ email: rec.email, name: rec.name, company: rec.company, title: rec.title, extra: rec.extra, news: rec.news })); } catch (e) {}
+  }
+  function record(lib, rec) {
+    var fm = lib.form || {};
+    if (!fm.action || !fm.fields) return;
+    var fd = new FormData();
+    Object.keys(fm.fields).forEach(function (k) { if (rec[k] !== undefined) fd.append(fm.fields[k], rec[k]); });
+    fetch(fm.action, { method: 'POST', mode: 'no-cors', body: fd }).catch(function () {});
   }
   var ORBIT = '<svg viewBox="0 0 400 400" aria-hidden="true"><circle cx="200" cy="200" r="190" fill="none" stroke="#60503e" stroke-opacity=".16"/><circle cx="200" cy="200" r="140" fill="none" stroke="#60503e" stroke-opacity=".22"/><circle cx="200" cy="200" r="90" fill="none" stroke="#60503e" stroke-opacity=".3"/><circle cx="200" cy="200" r="54" fill="#f7a23b" fill-opacity=".35"/><circle cx="200" cy="200" r="24" fill="#e8731a"/></svg>';
   function cover(g) {
@@ -569,12 +587,22 @@
     return c;
   }
   function action(g, lib) {
-    if (member) {
+    var k = knownLead();
+    if (k) {
+      var w = h('div');
       var a = h('a', 'smw-get');
       a.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M6 11l6 6 6-6M5 20h14"/></svg>';
       a.appendChild(document.createTextNode('PDF 바로 받기'));
-      if (g.file) { a.href = g.file; a.setAttribute('download', ''); } else a.href = g.url;
-      return a;
+      a.href = g.file || g.url; a.setAttribute('download', '');
+      a.addEventListener('click', function () {
+        record(lib, { email: k.email, name: k.name || '', company: k.company || '', title: k.title || '', guide: (g.no ? g.no + ' ' : '') + g.title, agree: '동의(이전 신청)', extra: k.extra || '미동의', news: k.news || '미동의', page: location.pathname });
+      });
+      w.appendChild(a);
+      var note = h('div', 'smw-f-cap'); note.appendChild(document.createTextNode(k.email + '(으)로 받습니다. '));
+      var other = h('a', '', '다른 이메일로 받기'); other.href = '#'; other.style.cssText = 'color:inherit;text-decoration:underline';
+      other.addEventListener('click', function (e) { e.preventDefault(); try { localStorage.removeItem('smw-lead'); } catch (x) {} memberInfo = null; w.replaceWith(guideForm(g, lib)); });
+      note.appendChild(other); w.appendChild(note);
+      return w;
     }
     return guideForm(g, lib);
   }
@@ -718,12 +746,8 @@
       var dl = h('a'); dl.href = g.file || g.url; dl.setAttribute('download', ''); dl.style.display = 'none';
       document.body.appendChild(dl); dl.click(); setTimeout(function () { dl.remove(); }, 1000);
       /* 2. 신청 기록 (구글 폼) */
-      var fm = lib.form || {};
-      if (fm.action && fm.fields) {
-        var fd = new FormData();
-        Object.keys(fm.fields).forEach(function (k) { if (rec[k] !== undefined) fd.append(fm.fields[k], rec[k]); });
-        fetch(fm.action, { method: 'POST', mode: 'no-cors', body: fd }).catch(function () {});
-      }
+      record(lib, rec);
+      saveLead(rec);
       /* 3. 뉴스레터 동의자만 구독 확인 메일 */
       if (news && lib.newsletter) {
         var body = { email: email, emailType: 'signup', newsletters: [{ name: lib.newsletter }], labels: [{ name: g.no || 'GUIDE' }] };
