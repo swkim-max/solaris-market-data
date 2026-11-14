@@ -146,6 +146,8 @@
     '.smw-pts li{position:relative;padding-left:14px;font-size:12px;line-height:1.55;color:#3d3b37;margin-top:4px}',
     '.smw-pts li::before{content:"";position:absolute;left:1px;top:6px;width:7px;height:4px;border-left:1.6px solid #e8731a;border-bottom:1.6px solid #e8731a;transform:rotate(-45deg)}',
     '.smw-meta2{display:flex;gap:10px;font-size:11px;color:#8a8780;margin-top:10px;font-variant-numeric:tabular-nums}',
+    '.smw-meta2{flex-wrap:wrap;row-gap:2px}',
+    '.smw-meta2 span{white-space:nowrap}',
     '.smw-meta2 span+span::before{content:"";display:inline-block;width:3px;height:3px;border-radius:50%;background:#c9c2b6;margin:0 10px 2px 0;vertical-align:middle}',
     '.smw-more{margin-top:18px;border-top:1px solid #e6e4df}',
     '.smw-row{all:unset;box-sizing:border-box;display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center;width:100%;padding:10px 0;border-bottom:1px solid #eeece8;cursor:pointer}',
@@ -897,8 +899,19 @@
     }
   }
 
+  function bootGuidesPage() {
+    var gp = document.getElementById('smw-guides');
+    if (!gp || !LIB_URL) return false;
+    injectCss();
+    Promise.all([
+      fetch(LIB_URL, { cache: 'no-cache' }).then(function (r) { return r.ok ? r.json() : null; }),
+      checkMember()
+    ]).then(function (x) { if (x[0]) { gp.innerHTML = ''; gp.appendChild(renderLibPage(x[0])); } }).catch(function () {});
+    return true;
+  }
   function boot() {
     if (!DATA_URL) return;
+    if (bootGuidesPage()) return;
     var on = /[?&]smw=preview\b/.test(location.search);
     try { if (on) sessionStorage.setItem('smw-preview', '1'); else on = sessionStorage.getItem('smw-preview') === '1'; } catch (e) {}
     var cls = document.body.classList;
