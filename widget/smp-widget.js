@@ -137,6 +137,26 @@
     '.smw-l-contact{font-size:12px;color:#8a8780;margin-top:10px;line-height:1.7;font-variant-numeric:tabular-nums}',
     '.smw-l-contact a{color:inherit !important;text-decoration:none !important}',
     '.smw-lrail{position:absolute;z-index:5}',
+    /* 지금 서울의 해 */
+    '.smw-sun{width:240px;word-break:keep-all;color:#3d3b37}',
+    '.smw-sun-eye{display:flex;justify-content:space-between;font-size:11px;font-weight:800;letter-spacing:.06em;color:var(--ghost-accent-color,#60503e);padding-bottom:10px;border-bottom:1px solid #e6e4df}',
+    '.smw-sun-eye span{font-weight:400;letter-spacing:0;color:#a3a09a;font-variant-numeric:tabular-nums}',
+    '.smw-sun svg{display:block;width:100%;height:auto;margin:14px 0 4px;overflow:visible}',
+    '.smw-sun-axis{display:flex;justify-content:space-between;font-size:10.5px;color:#a3a09a;font-variant-numeric:tabular-nums}',
+    '.smw-sun-lead{font-size:13.5px;line-height:1.55;color:#3d3b37;margin-top:14px}',
+    '.smw-sun-big{display:flex;align-items:baseline;gap:4px;margin:2px 0 2px}',
+    '.smw-sun-big b{font-size:34px;line-height:1.05;font-weight:800;color:#15171a;letter-spacing:-.02em;font-variant-numeric:tabular-nums}',
+    '.smw-sun-big i{font-style:normal;font-size:14px;color:#8a8780;font-weight:700}',
+    '.smw-sun-rows{margin-top:14px;border-top:1px solid #eeece8}',
+    '.smw-sun-rows div{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;padding:8px 0;border-bottom:1px solid #eeece8;font-variant-numeric:tabular-nums}',
+    '.smw-sun-rows span{color:#8a8780}',
+    '.smw-sun-rows b{color:#15171a}',
+    '.smw-sun-rows b.won{color:var(--ghost-accent-color,#60503e)}',
+    '.smw-sun-note{font-size:11px;color:#a3a09a;line-height:1.55;margin-top:8px}',
+    '.smw-sun-cta{display:block;margin-top:14px;font-size:12.5px;font-weight:800;color:var(--ghost-accent-color,#60503e) !important;text-decoration:none !important}',
+    '.smw-sun-cta:hover{text-decoration:underline !important}',
+    '@keyframes smw-glow{0%,100%{opacity:.35}50%{opacity:.7}}',
+    '.smw-sun .glow{animation:smw-glow 3.2s ease-in-out infinite}',
     '.smw-post .smw-band{margin:0}',
     '@media (prefers-reduced-motion:reduce){.smw-body,.smw-chev{transition:none}.smw-track{animation:none}.smw-tick{overflow-x:auto}}'
   ].join('\n');
@@ -507,6 +527,111 @@
     return box;
   }
 
+  /* ---------- 지금 서울의 해: 태양 위치와 1MW 발전량 추정 ---------- */
+  var LAT = 37.5665, LON = 126.978, RAD = Math.PI / 180, TILT = 30;
+  function sunAt(ms) {
+    var d = ms / 864e5 + 2440587.5 - 2451545.0;
+    var g = (357.529 + 0.98560028 * d) * RAD, q = 280.459 + 0.98564736 * d;
+    var L = (q + 1.915 * Math.sin(g) + 0.020 * Math.sin(2 * g)) * RAD;
+    var e = (23.439 - 0.00000036 * d) * RAD;
+    var ra = Math.atan2(Math.cos(e) * Math.sin(L), Math.cos(L));
+    var dec = Math.asin(Math.sin(e) * Math.sin(L));
+    var gmst = (18.697374558 + 24.06570982441908 * d) % 24;
+    var ha = ((gmst * 15 + LON) * RAD) - ra;
+    var la = LAT * RAD;
+    var el = Math.asin(Math.sin(la) * Math.sin(dec) + Math.cos(la) * Math.cos(dec) * Math.cos(ha));
+    var az = Math.atan2(-Math.sin(ha), Math.tan(dec) * Math.cos(la) - Math.sin(la) * Math.cos(ha));
+    return { el: el / RAD, az: (az / RAD + 360) % 360 };
+  }
+  /* 맑은 날, 남향 30° 고정식, 시스템 효율 0.8 기준 1MW 출력(kW) */
+  function powerKw(s) {
+    if (s.el <= 0.5) return 0;
+    var se = Math.sin(s.el * RAD), am = 1 / (se + 0.50572 * Math.pow(s.el + 6.07995, -1.6364));
+    var dni = 1353 * Math.pow(0.7, Math.pow(am, 0.678));
+    var cosi = se * Math.cos(TILT * RAD) + Math.cos(s.el * RAD) * Math.sin(TILT * RAD) * Math.cos((s.az - 180) * RAD);
+    var poa = dni * Math.max(0, cosi) + 0.1 * dni * (1 + Math.cos(TILT * RAD)) / 2;
+    return Math.max(0, Math.min(1000, poa * 0.8));
+  }
+  function kstDayStart(ms) { var k = ms + 9 * 36e5; return k - (k % 864e5) - 9 * 36e5; }
+  function hm(ms) { var k = new Date(ms + 9 * 36e5); return ('0' + k.getUTCHours()).slice(-2) + ':' + ('0' + k.getUTCMinutes()).slice(-2); }
+  function dayModel(now) {
+    var d0 = kstDayStart(now), step = 5 * 6e4, pts = [], rise = null, set = null, total = 0, sofar = 0;
+    for (var t = d0; t <= d0 + 864e5; t += step) {
+      var s = sunAt(t), p = powerKw(s);
+      if (rise === null && s.el > -0.833) rise = t;
+      if (rise !== null && set === null && s.el < -0.833 && t > rise) set = t;
+      pts.push({ t: t, p: p });
+      total += p * step / 36e5;
+      if (t <= now) sofar += p * step / 36e5;
+    }
+    return { pts: pts, rise: rise, set: set, total: total, sofar: sofar, now: powerKw(sunAt(now)), sun: sunAt(now) };
+  }
+  function won(v) {
+    if (v >= 1e4) return '약 ' + Math.round(v / 1e4).toLocaleString('ko-KR') + '만 원';
+    return '약 ' + Math.round(v).toLocaleString('ko-KR') + '원';
+  }
+  function renderSun(d) {
+    var smp = summarize(d).smp;
+    var box = h('aside', 'smw smw-sun');
+    box.setAttribute('aria-label', '지금 서울의 해와 1MW 태양광 발전량 추정');
+    function draw() {
+      var now = Date.now(), m = dayModel(now);
+      box.innerHTML = '';
+      var eye = h('div', 'smw-sun-eye'); eye.appendChild(document.createTextNode('SOLARIS · 지금 서울의 해')); eye.appendChild(h('span', '', hm(now)));
+      box.appendChild(eye);
+      var W = 240, H = 110, x0 = m.rise - 36e5, x1 = m.set + 36e5;
+      var X = function (t) { return (t - x0) / (x1 - x0) * W; }, Y = function (p) { return H - 6 - p / 1000 * (H - 22); };
+      var svg = svgEl('svg', { viewBox: '0 0 ' + W + ' ' + (H + 4), role: 'img', 'aria-label': '오늘 1MW 태양광 발전량 곡선과 현재 해의 위치' });
+      var defs = svgEl('defs', {}), gr = svgEl('linearGradient', { id: 'smwSunFill', x1: 0, y1: 0, x2: 0, y2: 1 });
+      gr.appendChild(svgEl('stop', { offset: '0', 'stop-color': '#f7a23b', 'stop-opacity': '.55' }));
+      gr.appendChild(svgEl('stop', { offset: '1', 'stop-color': '#f7a23b', 'stop-opacity': '.05' }));
+      defs.appendChild(gr); svg.appendChild(defs);
+      var vis = m.pts.filter(function (q) { return q.t >= x0 && q.t <= x1; });
+      var line = vis.map(function (q, i) { return (i ? 'L' : 'M') + X(q.t).toFixed(1) + ' ' + Y(q.p).toFixed(1); }).join(' ');
+      svg.appendChild(svgEl('line', { x1: 0, x2: W, y1: H - 6, y2: H - 6, stroke: '#d9d4cb', 'stroke-width': 1 }));
+      svg.appendChild(svgEl('path', { d: line, fill: 'none', stroke: '#e3b77d', 'stroke-width': 1.4, 'stroke-dasharray': '3 3' }));
+      var past = vis.filter(function (q) { return q.t <= now; });
+      if (past.length > 1) {
+        var pl = past.map(function (q, i) { return (i ? 'L' : 'M') + X(q.t).toFixed(1) + ' ' + Y(q.p).toFixed(1); }).join(' ');
+        svg.appendChild(svgEl('path', { d: pl + ' L' + X(past[past.length - 1].t).toFixed(1) + ' ' + (H - 6) + ' L' + X(past[0].t).toFixed(1) + ' ' + (H - 6) + ' Z', fill: 'url(#smwSunFill)' }));
+        svg.appendChild(svgEl('path', { d: pl, fill: 'none', stroke: '#e8731a', 'stroke-width': 2.2, 'stroke-linejoin': 'round' }));
+      }
+      var day = now > m.rise && now < m.set;
+      if (day) {
+        var sx = X(now), sy = Y(m.now);
+        svg.appendChild(svgEl('line', { x1: sx, x2: sx, y1: sy, y2: H - 6, stroke: '#e8731a', 'stroke-opacity': .35, 'stroke-width': 1 }));
+        svg.appendChild(svgEl('circle', { cx: sx, cy: sy, r: 13, fill: '#ffb347', class: 'glow' }));
+        svg.appendChild(svgEl('circle', { cx: sx, cy: sy, r: 6.5, fill: '#f28c18', stroke: '#fff', 'stroke-width': 2 }));
+      }
+      box.appendChild(svg);
+      var ax = h('div', 'smw-sun-axis'); ax.appendChild(h('span', '', '일출 ' + hm(m.rise))); ax.appendChild(h('span', '', '일몰 ' + hm(m.set)));
+      box.appendChild(ax);
+      var lead = h('div', 'smw-sun-lead'), big = h('div', 'smw-sun-big');
+      if (day) {
+        lead.appendChild(document.createTextNode('지금 1MW 태양광 발전소는'));
+        big.appendChild(h('b', '', Math.round(m.now).toLocaleString('ko-KR'))); big.appendChild(h('i', '', 'kW'));
+        lead.appendChild(big); lead.appendChild(document.createTextNode('로 전기를 만들고 있습니다.'));
+      } else {
+        lead.appendChild(document.createTextNode(now < m.rise ? '아직 해가 뜨기 전입니다. 오늘 1MW 발전소는' : '해가 졌습니다. 오늘 1MW 발전소는'));
+        big.appendChild(h('b', '', (m.total / 1000).toFixed(1))); big.appendChild(h('i', '', 'MWh'));
+        lead.appendChild(big); lead.appendChild(document.createTextNode(now < m.rise ? '를 만들 것으로 보입니다.' : '를 만들었습니다.'));
+      }
+      box.appendChild(lead);
+      var rows = h('div', 'smw-sun-rows');
+      function row(k, v, c) { var r = h('div'); r.appendChild(h('span', '', k)); r.appendChild(h('b', c || '', v)); rows.appendChild(r); }
+      if (day) row('지금까지', (m.sofar / 1000).toFixed(2) + ' MWh');
+      row(now >= m.set ? '오늘 하루' : '오늘 하루 예상', (m.total / 1000).toFixed(1) + ' MWh');
+      if (smp !== null) row('이번 주 SMP로 환산', won(m.total * smp), 'won');
+      box.appendChild(rows);
+      box.appendChild(h('div', 'smw-sun-note', '맑은 날, 남향 30° 설치 기준으로 계산한 추정치입니다. SMP 환산에는 REC 수익이 빠져 있습니다.'));
+      var cta = h('a', 'smw-sun-cta', '우리 발전소 수익 구조 상담하기 →'); cta.href = (ABOUT.cta && ABOUT.cta[1]) || '/contact/';
+      box.appendChild(cta);
+    }
+    draw();
+    setInterval(draw, 60000);
+    return box;
+  }
+
   /* ---------- 포스트에 붙이기 ---------- */
   var POST_MIN = CFG.postStripMin || 768;
   function placePost() {
@@ -562,7 +687,7 @@
       if (state.el) state.el.remove();
       if (state.left) { state.left.remove(); state.left = null; }
       if (mode === 'card') {
-        if (LEFT_ON) { state.left = h('div', 'smw-lrail'); state.left.appendChild(renderLeft()); document.body.appendChild(state.left); }
+        if (LEFT_ON) { state.left = h('div', 'smw-lrail'); state.left.appendChild(CFG.leftMode === 'about' ? renderLeft() : renderSun(state.data)); document.body.appendChild(state.left); }
         var rail = h('div', 'smw-rail');
         rail.appendChild(renderCard(state.data));
         document.body.appendChild(rail);
@@ -619,7 +744,7 @@
       .catch(function () { /* 데이터를 못 읽으면 아무것도 띄우지 않음 */ });
   }
 
-  window.SolarisMarketWidget = { renderCard: renderCard, renderBand: renderBand, renderLeft: renderLeft, renderStrip: renderStrip, injectCss: injectCss };
+  window.SolarisMarketWidget = { renderCard: renderCard, renderBand: renderBand, renderLeft: renderLeft, renderSun: renderSun, renderStrip: renderStrip, injectCss: injectCss };
   if (!CFG.manual) {
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
     else boot();
