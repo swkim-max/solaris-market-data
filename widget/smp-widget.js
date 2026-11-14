@@ -9,7 +9,7 @@
   var CARD_W = 256;
   var C_SMP = '#2563a8', C_SMP_LAST = '#f28c18', C_JKM = '#e8731a', C_ORANGE = '#ff9a1f', C_JEJU = '#14a37f', C_OIL = '#6b4f2e', C_UP = '#d33a2c', C_DOWN = '#2563a8', C_TTF = '#7c5cc4', C_HH = '#2f8f6b';
   var GAP = 48;
-  var POSTS_DEFAULT = false;
+  var POSTS_DEFAULT = true;
 
   var CSS = [
     '.smw{font-family:inherit;color:#15171a;-webkit-font-smoothing:antialiased;box-sizing:border-box}',
@@ -428,7 +428,7 @@
 
   function renderStrip(d) {
     var s = summarize(d);
-    var tone = (location.search.match(/[?&]smwtone=(\w+)/) || [])[1] || CFG.stripTone || 'brown';
+    var tone = (location.search.match(/[?&]smwtone=(\w+)/) || [])[1] || CFG.stripTone || 'light';
     var el = h(LINK ? 'a' : 'div', 'smw smw-strip' + (tone === 'black' ? '' : ' t-' + tone));
     if (LINK) { el.href = LINK; el.setAttribute('aria-label', '전력·가스 시세 전체 보기'); }
     var lbl = h('span', 'smw-strip-lbl'); lbl.appendChild(h('i')); lbl.appendChild(document.createTextNode('이번 주 전력·가스 시세'));
