@@ -10,6 +10,8 @@
   var C_SMP = '#2563a8', C_SMP_LAST = '#f28c18', C_JKM = '#e8731a', C_ORANGE = '#ff9a1f', C_JEJU = '#14a37f', C_OIL = '#6b4f2e', C_UP = '#d33a2c', C_DOWN = '#2563a8', C_TTF = '#7c5cc4', C_HH = '#2f8f6b';
   var GAP = 48;
   var POSTS_DEFAULT = true;
+  var LIB_DEFAULT = false;
+  var LIB_ON = false;
 
   var CSS = [
     '.smw{font-family:inherit;color:#15171a;-webkit-font-smoothing:antialiased;box-sizing:border-box}',
@@ -115,6 +117,22 @@
     '.t-light .smw-item .up{color:#d33a2c}.t-light .smw-item .down{color:#2563a8}',
     '.t-light .smw-sep{color:#c9c4bb}',
     '.smw-post{padding-top:16px}',
+    /* 왼쪽 자료실 */
+    '.smw-lrail{position:absolute;z-index:5}',
+    '.smw-lib{width:240px;word-break:keep-all;color:#3d3b37}',
+    '.smw-lib-h{display:flex;justify-content:space-between;align-items:baseline;font-size:11px;font-weight:800;letter-spacing:.06em;color:var(--ghost-accent-color,#60503e);padding-bottom:10px;border-bottom:1px solid #e6e4df}',
+    '.smw-lib-h a{font-size:11px;font-weight:700;letter-spacing:0;color:#8a8780 !important;text-decoration:none !important}',
+    '.smw-g{padding:16px 0;border-bottom:1px solid #eeece8}',
+    '.smw-g-cover{position:relative;height:132px;border-radius:6px;overflow:hidden;background:var(--ghost-accent-color,#60503e);color:#fff;padding:14px 14px 0;box-shadow:0 1px 0 rgba(0,0,0,.04),0 6px 16px -10px rgba(60,40,20,.5)}',
+    '.smw-g-cover::after{content:"";position:absolute;right:-34px;bottom:-40px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle at 40% 40%,#f7a23b 0,#e8731a 40%,rgba(232,115,26,0) 70%);opacity:.6}',
+    '.smw-g-no{font-size:9.5px;letter-spacing:.12em;opacity:.75}',
+    '.smw-g-ct{position:relative;z-index:1;font-size:15px;line-height:1.35;font-weight:800;margin-top:8px;letter-spacing:-.01em}',
+    '.smw-g-desc{font-size:12.5px;line-height:1.6;color:#5f5c56;margin:12px 0 0}',
+    '.smw-g-meta{font-size:11px;color:#a3a09a;margin-top:6px}',
+    '.smw-g-btn{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:12px;padding:10px 12px;border-radius:6px;background:var(--ghost-accent-color,#60503e);color:#fff !important;font-size:13px;font-weight:800;text-decoration:none !important;cursor:pointer}',
+    '.smw-g-btn:hover{filter:brightness(1.12)}',
+    '.smw-g-btn svg{flex:none}',
+    '.smw-lib-note{font-size:11px;line-height:1.6;color:#a3a09a;margin-top:10px}',
     '.smw-post .smw-band{margin:0}',
     '@media (prefers-reduced-motion:reduce){.smw-body,.smw-chev{transition:none}.smw-track{animation:none}.smw-tick{overflow-x:auto}}'
   ].join('\n');
@@ -438,6 +456,54 @@
     return el;
   }
 
+  /* ---------- 왼쪽 자료실 ---------- */
+  var LIB_URL = CFG.guidesUrl || (DATA_URL ? DATA_URL.replace(/[^\/]+$/, 'guides.json') : '');
+  var member = null;
+  function checkMember() {
+    return fetch('/members/api/member/', { credentials: 'same-origin' })
+      .then(function (r) { member = r.status === 200; })
+      .catch(function () { member = false; });
+  }
+  function renderLib(lib) {
+    var box = h('aside', 'smw smw-lib');
+    box.setAttribute('aria-label', lib.title || '자료실');
+    var head = h('div', 'smw-lib-h'); head.appendChild(h('span', '', lib.title || '자료실'));
+    var list = lib.guides || [];
+    if (list.length > 3 && lib.all) { var all = h('a', '', '전체 보기 →'); all.href = lib.all; head.appendChild(all); }
+    box.appendChild(head);
+    list.slice(0, 3).forEach(function (g) {
+      var it = h('div', 'smw-g');
+      var cv = h('div', 'smw-g-cover'); cv.appendChild(h('div', 'smw-g-no', g.no || 'GUIDE'));
+      cv.appendChild(h('div', 'smw-g-ct', g.title)); it.appendChild(cv);
+      it.appendChild(h('p', 'smw-g-desc', g.desc));
+      if (g.meta) it.appendChild(h('div', 'smw-g-meta', g.meta));
+      var btn = h('a', 'smw-g-btn');
+      btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M6 11l6 6 6-6M5 20h14"/></svg>';
+      btn.appendChild(document.createTextNode(member ? '바로 받기' : '무료로 받기'));
+      btn.href = g.url;
+      btn.addEventListener('click', function (e) {
+        if (member) return;
+        e.preventDefault();
+        try { localStorage.setItem('smw-guide-next', g.url); } catch (x) {}
+        location.hash = '#/portal/signup';
+      });
+      it.appendChild(btn);
+      box.appendChild(it);
+    });
+    box.appendChild(h('div', 'smw-lib-note', member ? '로그인되어 있어 바로 받을 수 있습니다.' : '이메일만 등록하면 무료로 받을 수 있습니다. 뉴스레터 수신은 선택이며 언제든 끊을 수 있습니다.'));
+    return box;
+  }
+  function goPendingGuide() {
+    var next = null;
+    try { next = localStorage.getItem('smw-guide-next'); } catch (x) {}
+    if (member && next && /^\/[\w\-\/]+$/.test(next)) {
+      try { localStorage.removeItem('smw-guide-next'); } catch (x) {}
+      location.href = next;
+      return true;
+    }
+    return false;
+  }
+
   /* ---------- 포스트에 붙이기 ---------- */
   var POST_MIN = CFG.postStripMin || 768;
   function placePost() {
@@ -491,7 +557,9 @@
     var mode = wantCard ? 'card' : 'band';
     if (mode !== state.mode) {
       if (state.el) state.el.remove();
+      if (state.left) { state.left.remove(); state.left = null; }
       if (mode === 'card') {
+        if (LIB_ON && state.lib && (state.lib.guides || []).length) { state.left = h('div', 'smw-lrail'); state.left.appendChild(renderLib(state.lib)); document.body.appendChild(state.left); }
         var rail = h('div', 'smw-rail');
         rail.appendChild(renderCard(state.data));
         document.body.appendChild(rail);
@@ -514,6 +582,11 @@
       var ch = card.offsetHeight;
       state.el.style.height = Math.max(r.bottom + window.pageYOffset - top, ch) + 'px';
       card.style.position = ch + 48 < window.innerHeight ? 'sticky' : 'static';
+      if (state.left) {
+        state.left.style.top = top + 'px';
+        state.left.style.left = (r.left + window.pageXOffset - GAP - 240) + 'px';
+        state.left.style.display = r.left >= 240 + GAP + 24 ? '' : 'none';
+      }
     }
   }
 
@@ -527,12 +600,20 @@
     var isPost = cls.contains('post-template') && (CFG.posts === true || POSTS_DEFAULT || on);
     if (!isHome && !isPost && CFG.homeOnly !== false) return;
     if (CFG.preview && !on) return;
+    LIB_ON = CFG.library === true || LIB_DEFAULT || on;
     var placer = isHome ? place : placePost;
     injectCss();
     fetch(DATA_URL, { cache: 'no-cache' })
       .then(function (res) { if (!res.ok) throw new Error(res.status); return res.json(); })
       .then(function (d) {
         state.data = d;
+        if (!isHome || !LIB_ON || !LIB_URL) return d;
+        return Promise.all([
+          fetch(LIB_URL, { cache: 'no-cache' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }),
+          checkMember()
+        ]).then(function (x) { state.lib = x[0]; if (goPendingGuide()) throw new Error('redirect'); return d; });
+      })
+      .then(function (d) {
         try { placer(); } catch (e) { if (state.el) state.el.remove(); return; }
         var t;
         var safe = function () { try { placer(); } catch (e) {} };
@@ -542,7 +623,7 @@
       .catch(function () { /* 데이터를 못 읽으면 아무것도 띄우지 않음 */ });
   }
 
-  window.SolarisMarketWidget = { renderCard: renderCard, renderBand: renderBand, renderStrip: renderStrip, injectCss: injectCss };
+  window.SolarisMarketWidget = { renderLib: renderLib, renderCard: renderCard, renderBand: renderBand, renderStrip: renderStrip, injectCss: injectCss };
   if (!CFG.manual) {
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
     else boot();
