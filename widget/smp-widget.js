@@ -225,9 +225,9 @@
     '.smw-libend .smw-hook{font-size:13px;margin-top:12px}',
     /* 자료실 전체 페이지 */
     '.smw-libpage{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:40px 28px}',
-    '.smw-card2 .smw-cov{width:72%}',
+    '.smw-card2-shelf{background:#f4f1ec;border-radius:10px;padding:28px 0 26px;display:flex;justify-content:center;margin-bottom:16px}',
+    '.smw-card2 .smw-card2-shelf .smw-cov{width:52%;margin:0}',
     '.smw-card2{display:flex;flex-direction:column}',
-    '.smw-card2 .smw-cov{margin-bottom:14px}',
     '.smw-card2 .smw-ft{font-size:16px}',
     '.smw-card2 .smw-f{margin-top:auto;padding-top:14px}',
     '.smw-post .smw-band{margin:0}',
@@ -673,7 +673,7 @@
   function renderLibPage(lib) {
     var grid = h('div', 'smw smw-libpage');
     (lib.guides || []).forEach(function (g) {
-      var c = h('article', 'smw-card2'); c.appendChild(cover(g));
+      var c = h('article', 'smw-card2'); var sh = h('div', 'smw-card2-shelf'); sh.appendChild(cover(g)); c.appendChild(sh);
       c.appendChild(h('div', 'smw-tag', (g.isNew ? 'NEW · ' : '') + (g.no || '')));
       c.appendChild(h('h3', 'smw-ft', g.title));
       if (g.hook) c.appendChild(h('p', 'smw-hook', g.hook));
