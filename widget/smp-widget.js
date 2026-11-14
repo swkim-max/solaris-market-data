@@ -93,6 +93,27 @@
     '.smw-strip-go{flex:none;display:flex;align-items:center;padding:0 24px 0 18px;font-size:12px;font-weight:700;color:'+C_ORANGE+';border-left:1px solid #2a2622;white-space:nowrap}',
     'a.smw-strip:hover .smw-strip-go{text-decoration:underline}',
     'a.smw-strip:focus-visible{outline:2px solid '+C_ORANGE+';outline-offset:-2px}',
+    /* 띠 색: 갈색(헤더 연장) */
+    '.smw-strip.t-brown{background:#4b3e30;border-bottom:0}',
+    '.t-brown .smw-tick{background:#4b3e30}',
+    '.t-brown .smw-tick::before{background:linear-gradient(90deg,#4b3e30,rgba(75,62,48,0))}',
+    '.t-brown .smw-tick::after{background:linear-gradient(270deg,#4b3e30,rgba(75,62,48,0))}',
+    '.t-brown .smw-strip-lbl,.t-brown .smw-strip-go{border-color:rgba(255,255,255,.1)}',
+    '.t-brown .smw-item .k{color:#cbbda9}.t-brown .smw-item .u,.t-brown .smw-item .b{color:#a8998a}',
+    '.t-brown .smw-item .v{color:#ffb35c;text-shadow:none}',
+    '.t-brown .smw-item .up{color:#ff9282}.t-brown .smw-item .down{color:#9fcbff}',
+    '.t-brown .smw-strip-go{color:#ffb35c}.t-brown .smw-strip-lbl i{background:#ffb35c;box-shadow:none}',
+    /* 띠 색: 밝은 바탕 */
+    '.smw-strip.t-light{background:#fff;color:#15171a;border-bottom:1px solid #ece8e1}',
+    '.t-light .smw-tick{background:#fff;color:#15171a}',
+    '.t-light .smw-tick::before{background:linear-gradient(90deg,#fff,rgba(255,255,255,0))}',
+    '.t-light .smw-tick::after{background:linear-gradient(270deg,#fff,rgba(255,255,255,0))}',
+    '.t-light .smw-strip-lbl{color:#60503e;border-color:#ece8e1}.t-light .smw-strip-go{color:#60503e;border-color:#ece8e1}',
+    '.t-light .smw-strip-lbl i{background:#60503e;box-shadow:none}',
+    '.t-light .smw-item .k{color:#8a8780}.t-light .smw-item .u,.t-light .smw-item .b{color:#a3a09a}',
+    '.t-light .smw-item .v{color:#15171a;text-shadow:none}',
+    '.t-light .smw-item .up{color:#d33a2c}.t-light .smw-item .down{color:#2563a8}',
+    '.t-light .smw-sep{color:#c9c4bb}',
     '.smw-post{padding-top:16px}',
     '.smw-post .smw-band{margin:0}',
     '@media (prefers-reduced-motion:reduce){.smw-body,.smw-chev{transition:none}.smw-track{animation:none}.smw-tick{overflow-x:auto}}'
@@ -407,7 +428,8 @@
 
   function renderStrip(d) {
     var s = summarize(d);
-    var el = h(LINK ? 'a' : 'div', 'smw smw-strip');
+    var tone = (location.search.match(/[?&]smwtone=(\w+)/) || [])[1] || CFG.stripTone || 'brown';
+    var el = h(LINK ? 'a' : 'div', 'smw smw-strip' + (tone === 'black' ? '' : ' t-' + tone));
     if (LINK) { el.href = LINK; el.setAttribute('aria-label', '전력·가스 시세 전체 보기'); }
     var lbl = h('span', 'smw-strip-lbl'); lbl.appendChild(h('i')); lbl.appendChild(document.createTextNode('이번 주 전력·가스 시세'));
     el.appendChild(lbl);
