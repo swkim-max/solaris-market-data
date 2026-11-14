@@ -14,7 +14,7 @@ out = {
     "latest": {r['key']: {"date": r['date'], "value": f(r['value']), "change": f(r['change']), "basis": r['basis']} for r in ml},
     "lng": [{"d": r['date'], "jkm": f(r['jkm']), "jkm_note": r['jkm_note'], "ttf": f(r['ttf']), "hh": f(r['hh'])} for r in sorted(lw, key=lambda r: r['date'])],
     "note": {"date": nt[-1]['date'], "text": nt[-1]['text']},
-    "sources": {"smp": "전력거래소(해줌 집계)", "lng": "JOGMEC 주간 동향", "oil": "한국은행·산업통상부(두바이유)", "fx": "서울 외환시장"},
+    "sources": {"smp": "전력거래소", "lng": "JOGMEC 주간 동향", "oil": "한국은행·산업통상부(두바이유)", "fx": "서울 외환시장"},
 }
 (D / 'smp-lng.json').write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding='utf-8')
 print('ok', len(out['smp_weekly']), len(out['lng']))

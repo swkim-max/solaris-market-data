@@ -6,4 +6,4 @@
 - `data/smp-lng.json`: 위젯이 읽는 파일. `python3 scripts/build.py`로 CSV에서 만듭니다.
 - `widget/smp-widget.js`: Ghost 코드 삽입(Site footer)으로 불러오는 위젯.
 
-출처: 육지 SMP는 전력거래소 자료(해줌 집계, 언론 인용 월평균), JKM·TTF·Henry Hub는 JOGMEC 주간 동향(Global LNG Hub 게재). 시장 동향 참고 자료이며 개별 거래·투자 판단의 근거가 아닙니다.
+출처: 육지 SMP는 전력거래소 자료, JKM·TTF·Henry Hub는 JOGMEC 주간 동향(Global LNG Hub 게재). 시장 동향 참고 자료이며 개별 거래·투자 판단의 근거가 아닙니다.
