@@ -120,15 +120,18 @@
     /* 왼쪽 소개 칸 */
     '.smw-left{width:240px;word-break:keep-all;font-size:13px;line-height:1.65;color:#3d3b37}',
     '.smw-l-eyebrow{font-size:11px;font-weight:800;letter-spacing:.06em;color:var(--ghost-accent-color,#60503e);padding-bottom:10px;border-bottom:1px solid #e6e4df}',
-    '.smw-l-h{font-size:17px;line-height:1.45;font-weight:800;color:#15171a;margin:14px 0 8px;letter-spacing:-.01em}',
-    '.smw-l-p{margin:0 0 16px;color:#5f5c56}',
-    '.smw-l-list{list-style:none;margin:0;padding:0;border-top:1px solid #eeece8}',
+    '.smw-l-h{font-size:18px;line-height:1.4;font-weight:800;color:#15171a;margin:14px 0 6px;letter-spacing:-.01em}',
+    '.smw-l-list{list-style:none;margin:0;padding:0}',
     '.smw-l-list li{border-bottom:1px solid #eeece8}',
-    '.smw-l-list a{display:block;padding:10px 0;text-decoration:none !important;color:inherit}',
-    '.smw-l-list b{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:#15171a}',
-    '.smw-l-list b::after{content:"→";font-weight:400;color:#b0aca4;transition:transform .15s,color .15s}',
-    '.smw-l-list a:hover b::after{transform:translateX(3px);color:var(--ghost-accent-color,#60503e)}',
-    '.smw-l-list span{display:block;font-size:12px;color:#8a8780;margin-top:2px;line-height:1.55}',
+    '.smw-l-list a{display:grid;grid-template-columns:22px 1fr;gap:0 8px;padding:12px 0;text-decoration:none !important;color:inherit}',
+    '.smw-l-list i{font-style:normal;font-size:11px;font-weight:800;color:#b5a894;padding-top:2px;font-variant-numeric:tabular-nums;transition:color .15s}',
+    '.smw-l-list b{display:block;font-size:13.5px;line-height:1.45;color:#15171a;transition:color .15s}',
+    '.smw-l-list span{display:block;font-size:12px;color:#8a8780;margin-top:3px;line-height:1.5}',
+    '.smw-l-list span::after{content:" →";color:#c9c2b6;transition:color .15s}',
+    '.smw-l-list a:hover b,.smw-l-list a:hover i,.smw-l-list a:hover span::after{color:var(--ghost-accent-color,#60503e)}',
+    '.smw-l-series{display:block;margin-top:14px;padding:10px 12px;background:#f6f4f0;border-radius:6px;font-size:12.5px;font-weight:700;color:#3d3b37 !important;text-decoration:none !important}',
+    '.smw-l-series em{font-style:normal;font-size:10.5px;font-weight:800;color:#fff;background:var(--ghost-accent-color,#60503e);border-radius:3px;padding:1px 5px;margin-right:6px;vertical-align:1px}',
+    '.smw-l-series:hover{background:#efebe4}',
     '.smw-l-cta{display:flex;align-items:center;justify-content:center;margin-top:18px;padding:10px 12px;border-radius:6px;background:var(--ghost-accent-color,#60503e);color:#fff !important;font-size:13px;font-weight:800;text-decoration:none !important}',
     '.smw-l-cta:hover{filter:brightness(1.1)}',
     '.smw-l-contact{font-size:12px;color:#8a8780;margin-top:10px;line-height:1.7;font-variant-numeric:tabular-nums}',
@@ -459,34 +462,42 @@
 
   var ABOUT = CFG.about || {
     eyebrow: '법률사무소 솔라리스 재생에너지팀',
-    title: '재생에너지 사업의 법률 문제를 처음부터 끝까지 다룹니다',
-    text: '부지 확보와 인허가부터 발전소 매매, 자금 조달, 건설·운영, 분쟁까지 사업의 단계마다 필요한 자문을 한 팀이 맡습니다.',
-    areas: [
-      ['인허가·규제', '발전사업허가, 개발행위허가, 출력제어 등 규제 대응', '/tag/regulation/'],
-      ['M&A·금융', '발전소 양수도, 법률 실사, 프로젝트 파이낸싱', '/tag/merger/'],
-      ['소송·분쟁', '한전 계약, 분양사기, 시공·운영 분쟁', '/tag/litigation/'],
-      ['정책·동향', 'RPS, PPA, ESS 입찰 등 제도 변화 해설', '/tag/insight/']
+    title: '지금 이런 상황이신가요?',
+    items: [
+      ['출력제어로 수익이 줄었습니다', '손실보상을 받을 수 있는지부터 봅니다', '/curtailment-legal-basis-compensation/'],
+      ['발전량이 예상보다 적게 나옵니다', '시공사·설계사 책임을 인정한 판례', '/solar-output-loss-damages-precedents/'],
+      ['발전소를 사거나 팔 계획입니다', '거래 구조 선택과 법률실사 순서', '/solar-plant-sale-structure-asset-share/'],
+      ['분양받은 발전소가 약속과 다릅니다', '법원이 사기로 본 기준과 피해 회복', '/solar-power-plant-scam-precedents/'],
+      ['이격거리 규제로 허가가 막혔습니다', '200m 상한과 조례 기준', '/solar-separation-distance-limit-200m/']
     ],
-    cta: ['상담 문의하기', '/contact/'],
+    series: ['연재', '출력제어의 법률적 쟁점 6편', '/renewable-energy-curtailment-causes/'],
+    cta: ['변호사에게 직접 상담하기', '/contact/'],
     phone: '02-6001-2903',
     email: 'info@solarislaw.net'
   };
   function renderLeft() {
     var a = ABOUT;
     var box = h('aside', 'smw smw-left');
-    box.setAttribute('aria-label', '솔라리스 소개');
+    box.setAttribute('aria-label', '상황별 안내');
     box.appendChild(h('div', 'smw-l-eyebrow', a.eyebrow));
     box.appendChild(h('div', 'smw-l-h', a.title));
-    box.appendChild(h('p', 'smw-l-p', a.text));
-    var ul = h('ul', 'smw-l-list');
-    a.areas.forEach(function (it) {
+    var ul = h('ol', 'smw-l-list');
+    a.items.forEach(function (it, i) {
       var li = h('li'), link = h('a');
       link.href = it[2];
-      link.appendChild(h('b', '', it[0]));
-      link.appendChild(h('span', '', it[1]));
+      link.appendChild(h('i', '', ('0' + (i + 1)).slice(-2)));
+      var tx = h('div');
+      tx.appendChild(h('b', '', it[0]));
+      tx.appendChild(h('span', '', it[1]));
+      link.appendChild(tx);
       li.appendChild(link); ul.appendChild(li);
     });
     box.appendChild(ul);
+    if (a.series) {
+      var sr = h('a', 'smw-l-series'); sr.href = a.series[2];
+      sr.appendChild(h('em', '', a.series[0])); sr.appendChild(document.createTextNode(a.series[1] + ' 처음부터 읽기'));
+      box.appendChild(sr);
+    }
     var cta = h('a', 'smw-l-cta', a.cta[0]); cta.href = a.cta[1]; box.appendChild(cta);
     var c = h('div', 'smw-l-contact');
     var tel = h('a', '', 'T. ' + a.phone); tel.href = 'tel:' + a.phone.replace(/-/g, '');
