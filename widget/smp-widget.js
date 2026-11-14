@@ -133,6 +133,27 @@
     '.smw-g-btn:hover{filter:brightness(1.12)}',
     '.smw-g-btn svg{flex:none}',
     '.smw-lib-note{font-size:11px;line-height:1.6;color:#a3a09a;margin-top:10px}',
+    '.smw-f{margin-top:12px}',
+    '.smw-f input[type=email],.smw-f input[type=text]{display:block;width:100%;font:inherit;font-size:13px;padding:9px 10px;border:1px solid #dcd8d0;border-radius:6px;background:#fff;color:#15171a;outline:none}',
+    '.smw-f input:focus{border-color:var(--ghost-accent-color,#60503e);box-shadow:0 0 0 3px rgba(96,80,62,.12)}',
+    '.smw-f-more{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s ease}',
+    '.smw-f[data-open="1"] .smw-f-more{grid-template-rows:1fr}',
+    '.smw-f-more>div{overflow:hidden}',
+    '.smw-f-more input{margin-top:6px}',
+    '.smw-f-opt{font-size:11px;color:#a3a09a;margin:10px 0 0}',
+    '.smw-f label.ck{display:grid;grid-template-columns:16px 1fr;gap:6px;align-items:start;font-size:11.5px;line-height:1.5;color:#5f5c56;margin-top:8px;cursor:pointer}',
+    '.smw-f label.ck input{margin:2px 0 0;accent-color:var(--ghost-accent-color,#60503e)}',
+    '.smw-f label.ck b{font-weight:800;color:#15171a}',
+    '.smw-f details{font-size:11px;color:#8a8780;margin:4px 0 0 22px}',
+    '.smw-f summary{cursor:pointer;color:#a3a09a}',
+    '.smw-f details p{margin:4px 0 0;line-height:1.55}',
+    '.smw-f button{all:unset;box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:6px;width:100%;margin-top:10px;padding:10px 12px;border-radius:6px;background:var(--ghost-accent-color,#60503e);color:#fff;font-size:13px;font-weight:800;cursor:pointer;text-align:center}',
+    '.smw-f button:hover{filter:brightness(1.12)}',
+    '.smw-f button:focus-visible{outline:2px solid #15171a;outline-offset:2px}',
+    '.smw-f button[disabled]{opacity:.6;cursor:default}',
+    '.smw-f-msg{font-size:12px;line-height:1.55;margin-top:8px;color:#b2412f}',
+    '.smw-f-ok{font-size:12.5px;line-height:1.6;margin-top:12px;padding:12px;border-radius:6px;background:#f6f4f0;color:#3d3b37}',
+    '.smw-f-ok b{display:block;color:#15171a;margin-bottom:2px}',
     '.smw-post .smw-band{margin:0}',
     '@media (prefers-reduced-motion:reduce){.smw-body,.smw-chev{transition:none}.smw-track{animation:none}.smw-tick{overflow-x:auto}}'
   ].join('\n');
@@ -477,21 +498,88 @@
       cv.appendChild(h('div', 'smw-g-ct', g.title)); it.appendChild(cv);
       it.appendChild(h('p', 'smw-g-desc', g.desc));
       if (g.meta) it.appendChild(h('div', 'smw-g-meta', g.meta));
-      var btn = h('a', 'smw-g-btn');
-      btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M6 11l6 6 6-6M5 20h14"/></svg>';
-      btn.appendChild(document.createTextNode(member ? '바로 받기' : '무료로 받기'));
-      btn.href = g.url;
-      btn.addEventListener('click', function (e) {
-        if (member) return;
-        e.preventDefault();
-        try { localStorage.setItem('smw-guide-next', g.url); } catch (x) {}
-        location.hash = '#/portal/signup';
-      });
-      it.appendChild(btn);
+      if (member) {
+        var btn = h('a', 'smw-g-btn');
+        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M6 11l6 6 6-6M5 20h14"/></svg>';
+        btn.appendChild(document.createTextNode('바로 받기'));
+        btn.href = g.url;
+        it.appendChild(btn);
+      } else {
+        it.appendChild(guideForm(g, lib));
+      }
       box.appendChild(it);
     });
-    box.appendChild(h('div', 'smw-lib-note', member ? '로그인되어 있어 바로 받을 수 있습니다.' : '이메일만 등록하면 무료로 받을 수 있습니다. 뉴스레터 수신은 선택이며 언제든 끊을 수 있습니다.'));
+    if (member) box.appendChild(h('div', 'smw-lib-note', '이미 이메일을 등록하셔서 바로 받을 수 있습니다.'));
     return box;
+  }
+  function field(type, ph, name) {
+    var i = h('input'); i.type = type; i.placeholder = ph; i.name = name; i.autocomplete = name === 'email' ? 'email' : name === 'name' ? 'name' : name === 'company' ? 'organization' : 'organization-title';
+    i.setAttribute('aria-label', ph); return i;
+  }
+  function check(id, html) {
+    var l = h('label', 'ck'); var c = h('input'); c.type = 'checkbox'; c.name = id;
+    var s = h('span'); s.innerHTML = html; l.appendChild(c); l.appendChild(s); return [l, c];
+  }
+  function guideForm(g, lib) {
+    var f = h('form', 'smw-f'); f.noValidate = true; f.dataset.open = '0';
+    var em = field('email', '이메일 주소', 'email'); f.appendChild(em);
+    var more = h('div', 'smw-f-more'), mi = h('div');
+    mi.appendChild(h('div', 'smw-f-opt', '아래는 선택 항목입니다. 비워도 받을 수 있습니다.'));
+    var nm = field('text', '이름 (선택)', 'name'), co = field('text', '회사 (선택)', 'company'), ti = field('text', '직급 (선택)', 'title');
+    mi.appendChild(nm); mi.appendChild(co); mi.appendChild(ti);
+    var c1 = check('agree', '<b>[필수]</b> 개인정보 수집·이용에 동의합니다.');
+    mi.appendChild(c1[0]);
+    var d1 = h('details'); d1.innerHTML = '<summary>내용 보기</summary><p>수집 항목: 이메일 주소<br>목적: 자료 발송과 회원 관리<br>보관 기간: 탈퇴할 때까지<br>동의하지 않으면 자료를 받을 수 없습니다.</p>';
+    mi.appendChild(d1);
+    var c2 = check('extra', '<b>[선택]</b> 이름·회사·직급 수집에 동의합니다.');
+    mi.appendChild(c2[0]);
+    var d2 = h('details'); d2.innerHTML = '<summary>내용 보기</summary><p>수집 항목: 이름·회사·직급<br>목적: 상담 문의 응대와 자료 이용 현황 파악<br>보관 기간: 탈퇴할 때까지<br>동의하지 않아도 자료를 받을 수 있으며 이 경우 입력한 선택 항목은 저장하지 않습니다.</p>';
+    mi.appendChild(d2);
+    var c3 = check('news', '<b>[선택]</b> 솔라리스 뉴스레터와 소식을 이메일로 받겠습니다.');
+    mi.appendChild(c3[0]);
+    var d3 = h('details'); d3.innerHTML = '<summary>내용 보기</summary><p>새 글과 세미나·자료 안내를 이메일로 보냅니다. 메일 하단 링크로 언제든 수신을 끊을 수 있습니다. 동의하지 않아도 자료를 받을 수 있습니다.</p>';
+    mi.appendChild(d3);
+    more.appendChild(mi); f.appendChild(more);
+    var bt = h('button'); bt.type = 'submit';
+    bt.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16v12H4zM4 7l8 6 8-6"/></svg>';
+    bt.appendChild(document.createTextNode('이메일로 받기'));
+    f.appendChild(bt);
+    var msg = h('div', 'smw-f-msg'); msg.setAttribute('role', 'alert'); f.appendChild(msg);
+    function open() { f.dataset.open = '1'; }
+    em.addEventListener('focus', open);
+    f.addEventListener('submit', function (e) {
+      e.preventDefault(); msg.textContent = '';
+      if (f.dataset.open !== '1') { open(); return; }
+      var email = em.value.trim();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { msg.textContent = '이메일 주소를 확인해 주세요.'; em.focus(); return; }
+      if (!c1[1].checked) { msg.textContent = '필수 항목인 개인정보 수집·이용에 동의해 주세요.'; return; }
+      var clip = function (v) { return v.trim().replace(/\s+/g, ' ').slice(0, 40); };
+      var labels = [g.no || 'GUIDE'];
+      var body = { email: email, emailType: 'signup', labels: labels, newsletters: [] };
+      if (c2[1].checked) {
+        if (clip(nm.value)) body.name = clip(nm.value);
+        if (clip(co.value)) labels.push('회사: ' + clip(co.value));
+        if (clip(ti.value)) labels.push('직급: ' + clip(ti.value));
+      }
+      if (c3[1].checked && lib.newsletter) body.newsletters = [{ name: lib.newsletter }];
+      body.labels = labels.map(function (n) { return { name: n }; });
+      bt.disabled = true;
+      try { localStorage.setItem('smw-guide-next', g.url); } catch (x) {}
+      fetch('/members/api/integrity-token/', { credentials: 'same-origin' })
+        .then(function (r) { return r.ok ? r.text() : ''; }).catch(function () { return ''; })
+        .then(function (tok) {
+          if (tok) body.integrityToken = tok;
+          return fetch('/members/api/send-magic-link/', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+        })
+        .then(function (r) {
+          if (!r.ok) throw new Error(r.status);
+          var ok = h('div', 'smw-f-ok'); ok.appendChild(h('b', '', '메일함을 확인해 주세요'));
+          ok.appendChild(document.createTextNode(email + '로 보낸 확인 메일의 링크를 누르면 다운로드 페이지가 열립니다. 메일이 보이지 않으면 스팸함도 확인해 주세요.'));
+          f.replaceWith(ok);
+        })
+        .catch(function () { bt.disabled = false; msg.textContent = '전송하지 못했습니다. 잠시 뒤 다시 시도하거나 info@solarislaw.net으로 요청해 주세요.'; });
+    });
+    return f;
   }
   function goPendingGuide() {
     var next = null;
