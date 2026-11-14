@@ -81,11 +81,8 @@
     return out;
   }
   function md(s) { var p = s.split('-'); return (+p[1]) + '/' + (+p[2]); }
-  var RANGE = { low: '초반', mid: '중반', high: '후반' };
   function jkmText(row) {
     if (!row) return '—';
-    var m = /(low|mid|high)\s*-?\s*(?:USD\s*)?(\d+)s/i.exec(row.jkm_note || '');
-    if (m) return m[2] + '달러 ' + RANGE[m[1].toLowerCase()];
     return f1(num(row.jkm)) + '달러';
   }
 
