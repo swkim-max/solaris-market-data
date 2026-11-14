@@ -12,7 +12,7 @@
   var POSTS_DEFAULT = true;
   var LIB_DEFAULT = true;
   var LIB_ON = false;
-  var LIB_POST_DEFAULT = false;
+  var LIB_POST_DEFAULT = true;
   var LIB_POST_ON = false;
 
   var CSS = [
