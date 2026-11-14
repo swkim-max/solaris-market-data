@@ -7,16 +7,17 @@
   var LINK = CFG.link || '';
   var MIN_DESKTOP = CFG.minDesktop || 1280;
   var CARD_W = 300;
-  var C_SMP = '#2563a8', C_SMP_LAST = '#e8731a', C_JKM = '#c2410c', C_UP = '#d33a2c', C_DOWN = '#2563a8', C_TTF = '#7c5cc4', C_HH = '#2f8f6b';
+  var C_SMP = '#2563a8', C_SMP_LAST = '#f28c18', C_JKM = '#e8731a', C_ORANGE = '#ff9a1f', C_UP = '#d33a2c', C_DOWN = '#2563a8', C_TTF = '#7c5cc4', C_HH = '#2f8f6b';
   var GAP = 48;
 
   var CSS = [
     '.smw{font-family:inherit;color:#15171a;-webkit-font-smoothing:antialiased;box-sizing:border-box}',
     '.smw *{box-sizing:border-box}',
     '.smw-acc{color:var(--ghost-accent-color,#5b4a39)}',
-    '.smw-card{width:' + CARD_W + 'px;background:#fff;border:1px solid #e6e4df;border-radius:10px;padding:20px 20px 16px}',
+    '.smw-card{width:' + CARD_W + 'px;background:#fff;border:1px solid #e6e4df;border-top:3px solid '+C_ORANGE+';border-radius:10px;padding:20px 20px 16px}',
     '.smw-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding-bottom:12px;border-bottom:1px solid #eeece8}',
-    '.smw-title{font-size:13px;font-weight:800;letter-spacing:.02em}',
+    '.smw-title{font-size:13px;font-weight:800;letter-spacing:.02em;display:flex;align-items:center;gap:6px}',
+    '.smw-title::before{content:"";width:7px;height:7px;border-radius:50%;background:'+C_ORANGE+';box-shadow:0 0 0 3px rgba(255,154,31,.2)}',
     '.smw-date{font-size:11px;color:#8a8780;white-space:nowrap}',
     '.smw-sec{padding:16px 0;border-bottom:1px solid #eeece8}',
     '.smw-lbl{font-size:11px;color:#8a8780;margin-bottom:6px}',
@@ -31,14 +32,17 @@
     '.smw-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;vertical-align:1px}',
     '.smw-mini{display:flex;gap:14px;font-size:11px;color:#6b6862;margin-top:10px;font-variant-numeric:tabular-nums}',
     '.smw-mini b{color:#15171a;font-weight:700}',
-    '.smw-note{font-size:12.5px;line-height:1.65;color:#3d3b37;padding:14px 0 4px}',
-    '.smw-link{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;text-decoration:none;margin-top:10px}',
-    '.smw-link:hover{text-decoration:underline}',
+    '.smw-note{font-size:12.5px;line-height:1.7;color:#3d3b37;padding:14px 0 4px}',
+    '.smw-note-h{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:800;color:#15171a;padding-top:14px}',
+    '.smw-note-h::before{content:"";width:3px;height:12px;border-radius:2px;background:'+C_ORANGE+'}',
+    '.smw-note-h+.smw-note{padding-top:6px}',
+    '.smw-link{display:flex;align-items:center;justify-content:center;gap:4px;font-size:12.5px;font-weight:800;text-decoration:none;margin-top:14px;padding:10px 12px;border-radius:8px;background:#0e0e0f;color:'+C_ORANGE+' !important}',
+    '.smw-link:hover{background:#26221d}',
     '.smw-foot{font-size:10px;line-height:1.5;color:#a3a09a;margin-top:12px}',
     '.smw-rail{position:absolute;z-index:5}',
     '.smw-rail .smw-card{position:sticky;top:24px}',
     /* 모바일 띠 */
-    '.smw-band{width:100%;margin:0 0 28px;border:1px solid #e6e4df;border-radius:12px;background:#fff;overflow:hidden}',
+    '.smw-band{width:100%;margin:0 0 28px;border:1px solid #e6e4df;border-top:3px solid #ff9a1f;border-radius:12px;background:#fff;overflow:hidden}',
     '.smw-bar{all:unset;box-sizing:border-box;display:grid;grid-template-columns:4px 1fr auto;gap:0 12px;align-items:center;width:100%;padding:12px 14px 12px 0;cursor:pointer;-webkit-tap-highlight-color:transparent}',
     '.smw-bar:focus-visible{outline:2px solid var(--ghost-accent-color,#5b4a39);outline-offset:-2px;border-radius:12px}',
     '.smw-stripe{align-self:stretch;background:var(--ghost-accent-color,#5b4a39);border-radius:0 3px 3px 0}',
@@ -57,26 +61,26 @@
     '.smw-two{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding-top:14px}',
     '.smw-two .smw-num{font-size:22px}',
     '.smw-two .smw-spark{height:44px}',
-    '.smw-tick{background:#161a21;color:#e9e6df;overflow:hidden;white-space:nowrap;position:relative;font-variant-numeric:tabular-nums}',
+    '.smw-tick{background:#0e0e0f;color:#e9e6df;overflow:hidden;white-space:nowrap;position:relative;font-variant-numeric:tabular-nums}',
     '.smw-tick::before,.smw-tick::after{content:"";position:absolute;top:0;bottom:0;width:22px;z-index:1;pointer-events:none}',
-    '.smw-tick::before{left:0;background:linear-gradient(90deg,#161a21,rgba(22,26,33,0))}',
-    '.smw-tick::after{right:0;background:linear-gradient(270deg,#161a21,rgba(22,26,33,0))}',
+    '.smw-tick::before{left:0;background:linear-gradient(90deg,#0e0e0f,rgba(14,14,15,0))}',
+    '.smw-tick::after{right:0;background:linear-gradient(270deg,#0e0e0f,rgba(14,14,15,0))}',
     '.smw-track{display:inline-flex;animation:smw-scroll var(--smw-dur,32s) linear infinite}',
     '.smw-tick:hover .smw-track{animation-play-state:paused}',
     '.smw-item{display:inline-flex;align-items:baseline;gap:6px;padding:0 18px;font-size:12.5px;letter-spacing:.01em}',
-    '.smw-item .k{color:#9aa3b2;font-size:11px;font-weight:700;letter-spacing:.04em}',
-    '.smw-item .v{color:#fff;font-weight:800}',
-    '.smw-item .u{color:#9aa3b2;font-size:10.5px}',
+    '.smw-item .k{color:#8d8a84;font-size:11px;font-weight:700;letter-spacing:.04em}',
+    '.smw-item .v{color:'+C_ORANGE+';font-weight:800;text-shadow:0 0 6px rgba(255,154,31,.45)}',
+    '.smw-item .u{color:#8d8a84;font-size:10.5px}',
     '.smw-item .c{font-weight:800}',
     '.smw-item .up{color:#ff5b4f}.smw-item .down{color:#4da3ff}',
-    '.smw-sep{color:#3b4250;padding:0 2px}',
+    '.smw-sep{color:#ff9a1f;opacity:.5;padding:0 2px}',
     '@keyframes smw-scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}',
     '.smw-card{padding-top:0;overflow:hidden}',
     '.smw-card .smw-tick{margin:0 -20px 14px;padding:10px 0}',
-    '.smw-band .smw-bar{background:#161a21;padding:0 12px 0 0;grid-template-columns:1fr auto;gap:0 8px}',
+    '.smw-band .smw-bar{background:#0e0e0f;padding:0 12px 0 0;grid-template-columns:1fr auto;gap:0 8px}',
     '.smw-band .smw-tick{padding:13px 0;min-width:0}',
-    '.smw-band .smw-chev{background:#2a303b}',
-    '.smw-band .smw-chev path{stroke:#e9e6df}',
+    '.smw-band .smw-chev{background:#2a2622}',
+    '.smw-band .smw-chev path{stroke:'+C_ORANGE+'}',
     '@media (prefers-reduced-motion:reduce){.smw-body,.smw-chev{transition:none}.smw-track{animation:none}.smw-tick{overflow-x:auto}}'
   ].join('\n');
 
@@ -231,9 +235,12 @@
     return sec;
   }
   function tail(box, s) {
-    if (s.note && s.note.text) box.appendChild(h('div', 'smw-note', sentences(s.note.text, 130)));
+    if (s.note && s.note.text) {
+      box.appendChild(h('div', 'smw-note-h', '이번 주 시장 해설'));
+      box.appendChild(h('div', 'smw-note', sentences(s.note.text, CFG.noteMax || 400)));
+    }
     if (LINK) {
-      var a = h('a', 'smw-link smw-acc', 'SMP·LNG 추이 전체 보기 →');
+      var a = h('a', 'smw-link', 'SMP·LNG 추이 전체 보기 →');
       a.href = LINK;
       box.appendChild(a);
     }
@@ -366,7 +373,10 @@
       var top = r.top + window.pageYOffset;
       state.el.style.left = (r.right + window.pageXOffset + GAP) + 'px';
       state.el.style.top = top + 'px';
-      state.el.style.height = Math.max(r.height, 520) + 'px';
+      var card = state.el.firstChild;
+      var ch = card.offsetHeight;
+      state.el.style.height = Math.max(r.height, ch) + 'px';
+      card.style.position = ch + 48 < window.innerHeight ? 'sticky' : 'static';
     }
   }
 
