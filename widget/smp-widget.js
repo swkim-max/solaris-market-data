@@ -7,7 +7,7 @@
   var LINK = CFG.link || '';
   var MIN_DESKTOP = CFG.minDesktop || 1280;
   var CARD_W = 256;
-  var C_SMP = '#2563a8', C_SMP_LAST = '#f28c18', C_JKM = '#e8731a', C_ORANGE = '#ff9a1f', C_UP = '#d33a2c', C_DOWN = '#2563a8', C_TTF = '#7c5cc4', C_HH = '#2f8f6b';
+  var C_SMP = '#2563a8', C_SMP_LAST = '#f28c18', C_JKM = '#e8731a', C_ORANGE = '#ff9a1f', C_JEJU = '#14a37f', C_OIL = '#6b4f2e', C_UP = '#d33a2c', C_DOWN = '#2563a8', C_TTF = '#7c5cc4', C_HH = '#2f8f6b';
   var GAP = 48;
 
   var CSS = [
@@ -28,6 +28,9 @@
     '.smw-spark{display:block;width:100%;height:38px;margin-top:8px}',
     '.smw-axis{display:flex;justify-content:space-between;font-size:10px;color:#8a8780;margin-top:4px;font-variant-numeric:tabular-nums}',
     '.smw-up{color:'+C_UP+'}','.smw-down{color:'+C_DOWN+'}',
+    '.smw-leg{display:flex;gap:10px;font-size:10px;color:#8a8780;margin-top:6px}',
+    '.smw-leg i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:4px;vertical-align:-1px}',
+    '.smw-item .b{color:#6f6c66;font-size:10px}',
     '.smw-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;vertical-align:1px}',
     '.smw-mini{display:flex;gap:14px;font-size:11px;color:#6b6862;margin-top:10px;font-variant-numeric:tabular-nums}',
     '.smw-mini b{color:#15171a;font-weight:700}',
@@ -64,7 +67,7 @@
     '.smw-tick::before,.smw-tick::after{content:"";position:absolute;top:0;bottom:0;width:22px;z-index:1;pointer-events:none}',
     '.smw-tick::before{left:0;background:linear-gradient(90deg,#0e0e0f,rgba(14,14,15,0))}',
     '.smw-tick::after{right:0;background:linear-gradient(270deg,#0e0e0f,rgba(14,14,15,0))}',
-    '.smw-track{display:inline-flex;animation:smw-scroll var(--smw-dur,32s) linear infinite}',
+    '.smw-track{display:inline-flex;animation:smw-scroll var(--smw-dur,48s) linear infinite}',
     '.smw-tick:hover .smw-track{animation-play-state:paused}',
     '.smw-item{display:inline-flex;align-items:baseline;gap:5px;padding:0 14px;font-size:12px;letter-spacing:.01em}',
     '.smw-item .k{color:#8d8a84;font-size:11px;font-weight:700;letter-spacing:.04em}',
@@ -122,6 +125,10 @@
     var lastTtf = tt[tt.length - 1], lastHh = hh[hh.length - 1];
     var m = (d.smp_monthly || []).filter(function (r) { return num(r.v) !== null; }).sort(function (a, b) { return a.m < b.m ? -1 : 1; });
     var lm = m[m.length - 1], pm = m[m.length - 2];
+    var jw = w.filter(function (r) { return num(r.jeju) !== null; });
+    var lj2 = jw[jw.length - 1], pj2 = jw[jw.length - 2];
+    var oil = (d.oil_monthly || []).filter(function (r) { return num(r.dubai) !== null; }).sort(function (a, b) { return a.m < b.m ? -1 : 1; });
+    var L = d.latest || {};
     return {
       weeks: w.slice(-12),
       jkmLine: l,
@@ -136,6 +143,12 @@
       ttfChg: tt.length > 1 ? num(lastTtf.ttf) - num(tt[tt.length - 2].ttf) : null,
       hhChg: hh.length > 1 ? num(lastHh.hh) - num(hh[hh.length - 2].hh) : null,
       month: lm ? (+lm.m.slice(5)) + '월' : '',
+      jeju: lj2 ? num(lj2.jeju) : null,
+      jejuChg: lj2 && pj2 && lj2.start === (lastW && lastW.start) ? num(lj2.jeju) - num(pj2.jeju) : null,
+      oilLine: oil,
+      oilLast: oil[oil.length - 1] || null,
+      dubai: L.dubai || null,
+      fx: L.usdkrw || null,
       smpMonth: lm ? num(lm.v) : null,
       smpMonthChg: lm && pm ? num(lm.v) - num(pm.v) : null,
       note: d.note || null,
@@ -150,18 +163,32 @@
     for (var k in attrs) e.setAttribute(k, attrs[k]);
     return e;
   }
-  function bars(values, label) {
+  function bars(values, label, overlay) {
     var W = 260, H = 52, n = values.length, gap = 3;
-    var max = Math.max.apply(null, values), min = Math.min.apply(null, values) * 0.75;
+    var all = values.concat((overlay || []).filter(function (v) { return v !== null; }));
+    var max = Math.max.apply(null, all), min = Math.min.apply(null, all) * 0.75;
     var svg = svgEl('svg', { viewBox: '0 0 ' + W + ' ' + H, preserveAspectRatio: 'none', class: 'smw-spark', role: 'img', 'aria-label': label });
     var bw = (W - gap * (n - 1)) / n;
+    var Y = function (v) { return H - Math.max(3, (v - min) / (max - min || 1) * (H - 4)); };
     values.forEach(function (v, i) {
-      var h = Math.max(3, (v - min) / (max - min || 1) * (H - 4));
       svg.appendChild(svgEl('rect', {
-        x: i * (bw + gap), y: H - h, width: bw, height: h, rx: 2,
+        x: i * (bw + gap), y: Y(v), width: bw, height: H - Y(v), rx: 2,
         fill: i === n - 1 ? C_SMP_LAST : C_SMP, 'fill-opacity': i === n - 1 ? 1 : 0.85
       }));
     });
+    if (overlay) {
+      var seg = '';
+      overlay.forEach(function (v, i) {
+        if (v === null) { seg += ' '; return; }
+        var cx = i * (bw + gap) + bw / 2;
+        seg += (seg && seg.slice(-1) !== ' ' ? 'L' : 'M') + cx.toFixed(1) + ' ' + Y(v).toFixed(1);
+      });
+      svg.appendChild(svgEl('path', { d: seg.replace(/ +M/g, ' M').trim(), fill: 'none', stroke: C_JEJU, 'stroke-width': 1.6, 'vector-effect': 'non-scaling-stroke' }));
+      overlay.forEach(function (v, i) {
+        if (v === null) return;
+        svg.appendChild(svgEl('circle', { cx: i * (bw + gap) + bw / 2, cy: Y(v), r: 2.4, fill: '#fff', stroke: C_JEJU, 'stroke-width': 1.4 }));
+      });
+    }
     return svg;
   }
   function axis(left, right) {
@@ -169,10 +196,11 @@
     a.appendChild(h('span', '', left)); a.appendChild(h('span', '', right));
     return a;
   }
-  function line(points, label) {
+  function line(points, label, key, color) {
+    key = key || 'jkm'; color = color || C_JKM;
     var W = 260, H = 52, pad = 3;
-    var xs = points.map(function (p) { return +new Date(p.d); });
-    var ys = points.map(function (p) { return num(p.jkm); });
+    var xs = points.map(function (p) { return +new Date(p.d || (p.m + '-15')); });
+    var ys = points.map(function (p) { return num(p[key]); });
     var x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs);
     var y0 = 0, y1 = Math.max.apply(null, ys) * 1.05;
     var X = function (v) { return pad + (v - x0) / (x1 - x0 || 1) * (W - pad * 2); };
@@ -180,8 +208,8 @@
     var svg = svgEl('svg', { viewBox: '0 0 ' + W + ' ' + H, preserveAspectRatio: 'none', class: 'smw-spark', role: 'img', 'aria-label': label });
     var dpath = points.map(function (p, i) { return (i ? 'L' : 'M') + X(xs[i]).toFixed(1) + ' ' + Y(ys[i]).toFixed(1); }).join(' ');
     var area = dpath + ' L' + X(x1).toFixed(1) + ' ' + (H - pad) + ' L' + X(x0).toFixed(1) + ' ' + (H - pad) + ' Z';
-    svg.appendChild(svgEl('path', { d: area, fill: C_JKM, 'fill-opacity': '0.16' }));
-    svg.appendChild(svgEl('path', { d: dpath, fill: 'none', stroke: C_JKM, 'stroke-width': 2.2, 'vector-effect': 'non-scaling-stroke', 'stroke-linejoin': 'round' }));
+    svg.appendChild(svgEl('path', { d: area, fill: color, 'fill-opacity': '0.16' }));
+    svg.appendChild(svgEl('path', { d: dpath, fill: 'none', stroke: color, 'stroke-width': 2.2, 'vector-effect': 'non-scaling-stroke', 'stroke-linejoin': 'round' }));
     return svg;
   }
 
@@ -206,8 +234,15 @@
     sec.appendChild(sub);
     if (s.weeks.length) {
       var vals = s.weeks.map(function (r) { return num(r.v); });
-      sec.appendChild(bars(vals, '최근 육지 SMP 주간 평균 막대그래프'));
+      var jv = s.weeks.map(function (r) { return num(r.jeju); });
+      sec.appendChild(bars(vals, '최근 육지 SMP 주간 평균 막대그래프와 제주 SMP 꺾은선', jv));
       sec.appendChild(axis(md(s.weeks[0].start) + '주', '최고 ' + Math.round(Math.max.apply(null, vals)) + ' · 최저 ' + Math.round(Math.min.apply(null, vals))));
+      var leg = h('div', 'smw-leg');
+      var l1 = h('span'); var i1 = h('i'); i1.style.background = C_SMP; l1.appendChild(i1); l1.appendChild(document.createTextNode('육지'));
+      var l2 = h('span'); var i2 = h('i'); i2.style.background = C_JEJU; i2.style.borderRadius = '50%'; l2.appendChild(i2);
+      l2.appendChild(document.createTextNode('제주 ' + (s.jeju !== null ? f1(s.jeju) + '원' : '')));
+      leg.appendChild(l1); leg.appendChild(l2);
+      sec.appendChild(leg);
     }
     return sec;
   }
@@ -233,6 +268,32 @@
     }
     return sec;
   }
+  function oilBlock(s, compact) {
+    var sec = h('div', compact ? '' : 'smw-sec');
+    sec.appendChild(h('div', 'smw-lbl', '두바이유 · 국제유가'));
+    var big = h('div', 'smw-big');
+    big.appendChild(h('span', 'smw-num', s.dubai ? f1(s.dubai.value) : '—'));
+    big.appendChild(h('span', 'smw-unit', '달러/배럴'));
+    if (!compact && s.dubai && s.dubai.change !== null) big.appendChild(h('span', 'smw-chg ' + signCls(s.dubai.change), sign(s.dubai.change)));
+    sec.appendChild(big);
+    var sub = h('div', 'smw-sub');
+    if (s.dubai) sub.textContent = md(s.dubai.date) + ' 기준' + (s.oilLast ? ' · ' + (+s.oilLast.m.slice(5)) + '월 평균 ' + f1(num(s.oilLast.dubai)) + '달러' : '');
+    sec.appendChild(sub);
+    if (s.oilLine.length > 1) {
+      sec.appendChild(line(s.oilLine, '두바이유 월평균 추이선', 'dubai', C_OIL));
+      var fm = s.oilLine[0].m.split('-');
+      sec.appendChild(axis(fm[0].slice(2) + '.' + (+fm[1]) + ' 월평균', (+s.oilLast.m.slice(5)) + '월'));
+    }
+    if (!compact && s.fx) {
+      var mini = h('div', 'smw-mini');
+      var a = h('span'); a.appendChild(document.createTextNode('원/달러 ')); a.appendChild(h('b', '', s.fx.value.toLocaleString('ko-KR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '원'));
+      if (s.fx.change !== null) { var c = h('span', signCls(s.fx.change), ' ' + sign(s.fx.change)); a.appendChild(c); }
+      mini.appendChild(a);
+      sec.appendChild(mini);
+    }
+    return sec;
+  }
+
   function tail(box, s) {
     if (s.note && s.note.text) {
       box.appendChild(h('div', 'smw-note-h', '이번 주 시장 해설'));
@@ -243,16 +304,20 @@
       a.href = LINK;
       box.appendChild(a);
     }
-    box.appendChild(h('div', 'smw-foot', '출처: ' + (s.src.smp || '전력거래소') + ', ' + (s.src.lng || 'JOGMEC') + '. 시장 동향 참고 자료이며 개별 거래·투자 판단의 근거가 아닙니다.'));
+    box.appendChild(h('div', 'smw-foot', '출처: ' + [s.src.smp || '전력거래소', s.src.lng || 'JOGMEC', s.src.oil, s.src.fx].filter(Boolean).join(', ') + '. 시장 동향 참고 자료이며 개별 거래·투자 판단의 근거가 아닙니다.'));
   }
 
   function ticker(s) {
+    var fxv = s.fx ? s.fx.value.toLocaleString('ko-KR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) : '—';
     var items = [
       ['육지 SMP 주간', f1(s.smp), '원/kWh', s.smpChg],
+      ['제주 SMP 주간', f1(s.jeju), '원/kWh', s.jejuChg],
       ['SMP ' + s.month + ' 평균', f1(s.smpMonth), '원/kWh', s.smpMonthChg],
       ['JKM 아시아 LNG', f1(s.jkm ? num(s.jkm.jkm) : null), '$/MMBtu', s.jkmDir],
       ['TTF 유럽', f1(s.ttf), '$/MMBtu', s.ttfChg],
-      ['Henry Hub 미국', f1(s.hh), '$/MMBtu', s.hhChg]
+      ['Henry Hub 미국', f1(s.hh), '$/MMBtu', s.hhChg],
+      ['두바이유', s.dubai ? f1(s.dubai.value) : '—', '$/배럴', s.dubai ? s.dubai.change : null, s.dubai ? s.dubai.basis : ''],
+      ['원/달러', fxv, '원', s.fx ? s.fx.change : null, s.fx ? s.fx.basis : '']
     ];
     var box = h('div', 'smw-tick');
     box.setAttribute('role', 'marquee');
@@ -266,6 +331,7 @@
         el.appendChild(h('span', 'v', it[1]));
         el.appendChild(h('span', 'u', it[2]));
         if (it[3] !== null && it[3] !== undefined) el.appendChild(h('span', 'c ' + (it[3] > 0 ? 'up' : it[3] < 0 ? 'down' : ''), sign(it[3])));
+        if (it[4]) el.appendChild(h('span', 'b', it[4]));
         track.appendChild(el);
         track.appendChild(h('span', 'smw-sep', '·'));
       });
@@ -285,6 +351,7 @@
     card.appendChild(head);
     card.appendChild(smpBlock(s, false));
     card.appendChild(jkmBlock(s, false));
+    card.appendChild(oilBlock(s, false));
     tail(card, s);
     return card;
   }
@@ -311,6 +378,8 @@
     two.appendChild(smpBlock(s, true));
     two.appendChild(jkmBlock(s, true));
     inner.appendChild(two);
+    var ob = oilBlock(s, true); ob.style.paddingTop = '14px';
+    inner.appendChild(ob);
     tail(inner, s);
     wrap.appendChild(inner);
     body.appendChild(wrap);

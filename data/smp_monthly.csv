@@ -1,14 +1,14 @@
-month,smp,basis,source
-2025-10,99.92,해줌 집계(전력거래소 일별 SMP 단순평균),https://blog.haezoom.com/smprec_202510month/
-2025-11,94.34,해줌 집계(전력거래소 일별 SMP 단순평균),https://blog.haezoom.com/smprec_202511month/
-2025-12,90.43,전력거래소 월평균(언론 인용),https://www.heraldk.com/article/2026062118224578331
-2026-01,103.54,전력거래소 월평균(언론 인용),https://www.heraldk.com/article/2026062118224578331
-2026-02,108.52,전력거래소 월평균(언론 인용),https://www.heraldk.com/article/2026062118224578331
-2026-03,110.03,전력거래소 월평균(언론 인용),https://www.heraldk.com/article/2026062118224578331
-2026-04,118.94,전력거래소 월평균(언론 인용),https://www.heraldk.com/article/2026062118224578331
-2026-05,121.91,전력거래소 월평균(언론 인용),https://www.heraldk.com/article/2026062118224578331
-2026-06,114.11,전력거래소 월평균(언론 인용),https://m.dailian.co.kr/news/view/1688972/
-2026-07,133.79,전력거래소 월평균(언론 인용),https://m.dailian.co.kr/news/view/1688972/
-2026-08,147.88,해줌 집계(전력거래소 일별 SMP 단순평균),https://blog.haezoom.com/smprec_202610month/
-2026-09,116.74,해줌 집계(전력거래소 일별 SMP 단순평균),https://blog.haezoom.com/smprec_202609month/
-2026-10,109.82,해줌 집계(전력거래소 일별 SMP 단순평균),https://blog.haezoom.com/smprec_202610month/
+month,smp,jeju,basis,source
+2025-10,99.92,100.62,해줌 집계(전력거래소 일별 SMP 단순평균),https://blog.haezoom.com/smprec_202510month/
+2025-11,94.34,95.66,해줌 집계(전력거래소 일별 SMP 단순평균),https://blog.haezoom.com/smprec_202511month/
+2025-12,90.43,,전력거래소 월평균(언론 인용),https://www.heraldk.com/article/2026062118224578331
+2026-01,103.54,,전력거래소 월평균(언론 인용),https://www.heraldk.com/article/2026062118224578331
+2026-02,108.52,,전력거래소 월평균(언론 인용),https://www.heraldk.com/article/2026062118224578331
+2026-03,110.03,106.68,전력거래소 월평균(언론 인용),https://www.heraldk.com/article/2026062118224578331
+2026-04,118.94,,전력거래소 월평균(언론 인용),https://www.heraldk.com/article/2026062118224578331
+2026-05,121.91,,전력거래소 월평균(언론 인용),https://www.heraldk.com/article/2026062118224578331
+2026-06,114.11,113.57,전력거래소 월평균(언론 인용),https://m.dailian.co.kr/news/view/1688972/
+2026-07,133.79,133.42,전력거래소 월평균(언론 인용),https://m.dailian.co.kr/news/view/1688972/
+2026-08,147.88,,해줌 집계(전력거래소 일별 SMP 단순평균),https://blog.haezoom.com/smprec_202610month/
+2026-09,116.74,117.04,해줌 집계(전력거래소 일별 SMP 단순평균),https://blog.haezoom.com/smprec_202609month/
+2026-10,109.82,107.24,해줌 집계(전력거래소 일별 SMP 단순평균),https://blog.haezoom.com/smprec_202610month/
