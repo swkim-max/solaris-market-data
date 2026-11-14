@@ -183,8 +183,8 @@
     var sec = h('div', compact ? '' : 'smw-sec');
     sec.appendChild(h('div', 'smw-lbl', 'JKM · 아시아 LNG 현물'));
     var big = h('div', 'smw-big');
-    big.appendChild(h('span', 'smw-num', jkmText(s.jkm)));
-    if (!compact) big.appendChild(h('span', 'smw-unit', '/MMBtu'));
+    big.appendChild(h('span', 'smw-num', s.jkm ? f1(num(s.jkm.jkm)) : '—'));
+    big.appendChild(h('span', 'smw-unit', '달러/MMBtu'));
     sec.appendChild(big);
     sec.appendChild(h('div', 'smw-sub', '1년 전 ' + jkmText(s.jkmFirst)));
     if (s.jkmLine.length > 1) {
