@@ -12,6 +12,8 @@
   var POSTS_DEFAULT = true;
   var LIB_DEFAULT = true;
   var LIB_ON = false;
+  var LIB_POST_DEFAULT = false;
+  var LIB_POST_ON = false;
 
   var CSS = [
     '.smw{font-family:inherit;color:#15171a;-webkit-font-smoothing:antialiased;box-sizing:border-box}',
@@ -194,6 +196,13 @@
     '.smw-f-ok{font-size:12.5px;line-height:1.6;margin-top:14px;padding:12px;border-radius:7px;background:#f7f5f1;color:#3d3b37}',
     '.smw-f-ok b{display:block;color:#15171a;margin-bottom:2px}',
     '.smw-get{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:14px;padding:11px 12px;border-radius:7px;background:var(--ghost-accent-color,#60503e);color:#fff !important;font-size:13px;font-weight:800;text-decoration:none !important}',
+    '.smw-lib-c{width:232px}',
+    '.smw-lib-c .smw-feat{padding-top:16px}',
+    '.smw-lib-c .smw-stack{width:104px}',
+    '.smw-lib-c .smw-pts{display:none}',
+    '.smw-lib-c .smw-ft{font-size:15px}',
+    '.smw-lib-c .smw-hook{font-size:12px}',
+    '.smw-lib-c .smw-tag{margin-top:14px}',
     /* 자료실 전체 페이지 */
     '.smw-libpage{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:40px 28px}',
     '.smw-card2 .smw-cov{width:72%}',
@@ -566,10 +575,10 @@
     w.appendChild(action(g, lib));
     return w;
   }
-  function renderLib(lib, max) {
+  function renderLib(lib, max, compact) {
     max = max || 4;
     var list = lib.guides || [];
-    var box = h('aside', 'smw smw-lib');
+    var box = h('aside', 'smw smw-lib' + (compact ? ' smw-lib-c' : ''));
     box.setAttribute('aria-label', lib.title || '자료실');
     var head = h('div', 'smw-lib-h'); head.appendChild(h('b', '', 'SOLARIS 자료실'));
     head.appendChild(h('span', '', '무료 가이드 ' + list.length + '종'));
@@ -579,6 +588,11 @@
     function show(i) {
       slot.innerHTML = ''; slot.appendChild(featured(list[i], lib));
       rows.forEach(function (r) { r.setAttribute('aria-current', r.dataset.i == i ? 'true' : 'false'); });
+    }
+    if (compact) {
+      if (list.length) show(0);
+      if (list.length > 1 && lib.all) { var al = h('a', 'smw-all', '자료 ' + list.length + '종 모두 보기 →'); al.href = lib.all; box.appendChild(al); }
+      return box;
     }
     if (list.length > 1) {
       var more = h('div', 'smw-more');
@@ -708,13 +722,40 @@
     var head = document.querySelector('.gh-head') || document.querySelector('header');
     if (!head) return;
     var mode = window.innerWidth >= POST_MIN ? 'strip' : 'band';
-    if (mode === state.mode) return;
-    if (state.el) state.el.remove();
-    var el;
-    if (mode === 'strip') el = renderStrip(state.data);
-    else { el = h('div', 'gh-canvas smw-post'); el.appendChild(renderBand(state.data)); }
-    head.parentNode.insertBefore(el, head.nextSibling);
-    state.el = el; state.mode = mode;
+    if (mode !== state.mode) {
+      if (state.el) state.el.remove();
+      var el;
+      if (mode === 'strip') el = renderStrip(state.data);
+      else { el = h('div', 'gh-canvas smw-post'); el.appendChild(renderBand(state.data)); }
+      head.parentNode.insertBefore(el, head.nextSibling);
+      state.el = el; state.mode = mode;
+    }
+    placePostLib();
+  }
+  var LIB_C_W = 232;
+  function placePostLib() {
+    var body = document.querySelector('.gh-content');
+    var ok = LIB_POST_ON && state.lib && (state.lib.guides || []).length && body;
+    var first = ok && body.querySelector(':scope > p, :scope > h2, :scope > h3, :scope > ul, :scope > ol, :scope > blockquote');
+    var cr = first ? first.getBoundingClientRect() : null;
+    var fit = cr && window.innerWidth >= MIN_DESKTOP && cr.left >= LIB_C_W + GAP + 24;
+    if (!fit) { if (state.left) { state.left.remove(); state.left = null; } return; }
+    if (!state.left) {
+      state.left = h('div', 'smw-lrail');
+      state.left.appendChild(renderLib(state.lib, 1, true));
+      document.body.appendChild(state.left);
+    }
+    var br = body.getBoundingClientRect();
+    var top = br.top + window.pageYOffset + 8;
+    var endEl = document.querySelector('.single-footer') || body;
+    var bottom = endEl.getBoundingClientRect().top + window.pageYOffset;
+    var gap = Math.max(GAP, Math.min(96, cr.left - LIB_C_W - 32));
+    state.left.style.top = top + 'px';
+    state.left.style.left = (cr.left + window.pageXOffset - gap - LIB_C_W) + 'px';
+    var inner = state.left.firstChild, ih = inner.offsetHeight;
+    state.left.style.height = Math.max(bottom - top, ih) + 'px';
+    inner.style.position = ih + 48 < window.innerHeight ? 'sticky' : 'static';
+    inner.style.top = '24px';
   }
 
   /* ---------- 블로그에 붙이기 ---------- */
@@ -773,7 +814,9 @@
     if (mode === 'card') {
       var hb = (f.ghost ? f.column : f.heading).getBoundingClientRect();
       var top = hb.bottom + 24 + window.pageYOffset;
-      state.el.style.left = (r.right + window.pageXOffset + GAP) + 'px';
+      var side = Math.min(r.left, document.documentElement.clientWidth - r.right);
+      var gap = Math.max(GAP, Math.min(120, side - 256 - 32));
+      state.el.style.left = (r.right + window.pageXOffset + gap) + 'px';
       state.el.style.top = top + 'px';
       var card = state.el.firstChild;
       var ch = card.offsetHeight;
@@ -781,7 +824,7 @@
       card.style.position = ch + 48 < window.innerHeight ? 'sticky' : 'static';
       if (state.left) {
         state.left.style.top = top + 'px';
-        state.left.style.left = (r.left + window.pageXOffset - GAP - 256) + 'px';
+        state.left.style.left = (r.left + window.pageXOffset - gap - 256) + 'px';
         state.left.style.display = r.left >= 256 + GAP + 24 ? '' : 'none';
       }
     }
@@ -798,13 +841,14 @@
     if (!isHome && !isPost && CFG.homeOnly !== false) return;
     if (CFG.preview && !on) return;
     LIB_ON = CFG.library === true || LIB_DEFAULT || on;
+    LIB_POST_ON = LIB_ON && (CFG.libraryPosts === true || LIB_POST_DEFAULT || on);
     var placer = isHome ? place : placePost;
     injectCss();
     fetch(DATA_URL, { cache: 'no-cache' })
       .then(function (res) { if (!res.ok) throw new Error(res.status); return res.json(); })
       .then(function (d) {
         state.data = d;
-        if (!isHome || !LIB_ON || !LIB_URL) return d;
+        if (!(isHome ? LIB_ON : LIB_POST_ON) || !LIB_URL) return d;
         return Promise.all([
           fetch(LIB_URL, { cache: 'no-cache' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }),
           checkMember()
@@ -816,6 +860,7 @@
         var safe = function () { try { placer(); } catch (e) {} };
         window.addEventListener('resize', function () { clearTimeout(t); t = setTimeout(safe, 120); });
         window.addEventListener('load', safe);
+        setTimeout(safe, 1500); setTimeout(safe, 4000);
       })
       .catch(function () { /* 데이터를 못 읽으면 아무것도 띄우지 않음 */ });
   }
