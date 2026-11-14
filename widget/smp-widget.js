@@ -10,7 +10,7 @@
   var C_SMP = '#2563a8', C_SMP_LAST = '#f28c18', C_JKM = '#e8731a', C_ORANGE = '#ff9a1f', C_JEJU = '#14a37f', C_OIL = '#6b4f2e', C_UP = '#d33a2c', C_DOWN = '#2563a8', C_TTF = '#7c5cc4', C_HH = '#2f8f6b';
   var GAP = 48;
   var POSTS_DEFAULT = true;
-  var LIB_DEFAULT = false;
+  var LIB_DEFAULT = true;
   var LIB_ON = false;
 
   var CSS = [
