@@ -627,7 +627,6 @@
     var box = h('aside', 'smw smw-lib' + (compact ? ' smw-lib-c' : ''));
     box.setAttribute('aria-label', lib.title || '자료실');
     var head = h('div', 'smw-lib-h'); head.appendChild(h('b', '', 'SOLARIS 자료실'));
-    head.appendChild(h('span', '', '무료 가이드 ' + list.length + '종'));
     box.appendChild(head);
     var slot = h('div'); box.appendChild(slot);
     var rows = [];
@@ -659,7 +658,7 @@
   function renderEnd(lib) {
     var g = (lib.guides || [])[0]; if (!g) return null;
     var box = h('aside', 'smw smw-libend'); box.setAttribute('aria-label', '무료 가이드');
-    var head = h('div', 'smw-lib-h'); head.appendChild(h('b', '', 'SOLARIS 자료실')); head.appendChild(h('span', '', '무료 가이드')); box.appendChild(head);
+    var head = h('div', 'smw-lib-h'); head.appendChild(h('b', '', 'SOLARIS 자료실')); box.appendChild(head);
     var row = h('div', 'smw-libend-row'); row.appendChild(cover(g));
     var tx = h('div'); tx.appendChild(h('div', 'smw-tag', (g.isNew ? 'NEW · ' : '') + (g.no || ''))); tx.appendChild(h('h3', 'smw-ft', g.title));
     if (g.meta) { var m = h('div', 'smw-meta2'); g.meta.split('·').forEach(function (x) { m.appendChild(h('span', '', x.trim())); }); tx.appendChild(m); }
