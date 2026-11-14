@@ -624,7 +624,7 @@
     var go = h('button', 'smw-f-go'); go.type = 'button'; go.setAttribute('aria-label', '받기');
     go.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
     row.appendChild(go); f.appendChild(row);
-    f.appendChild(h('div', 'smw-f-cap', '이메일로 바로 보내 드립니다. 무료입니다.'));
+    f.appendChild(h('div', 'smw-f-cap', '이메일을 남기시면 바로 내려받을 수 있습니다. 무료입니다.'));
     go.addEventListener('click', function () { f.dataset.open = '1'; em.focus(); });
     var more = h('div', 'smw-f-more'), mi = h('div');
     mi.appendChild(h('div', 'smw-f-opt', '아래는 선택 항목입니다. 비워도 받을 수 있습니다.'));
@@ -632,11 +632,11 @@
     mi.appendChild(nm); mi.appendChild(co); mi.appendChild(ti);
     var c1 = check('agree', '<b>[필수]</b> 개인정보 수집·이용에 동의합니다.');
     mi.appendChild(c1[0]);
-    var d1 = h('details'); d1.innerHTML = '<summary>내용 보기</summary><p>수집 항목: 이메일 주소<br>목적: 자료 발송과 회원 관리<br>보관 기간: 탈퇴할 때까지<br>동의하지 않으면 자료를 받을 수 없습니다.</p>';
+    var d1 = h('details'); d1.innerHTML = '<summary>내용 보기</summary><p>수집 항목: 이메일 주소<br>목적: 자료 신청 기록 관리<br>보관 기간: 신청일부터 1년<br>동의하지 않으면 자료를 받을 수 없습니다.</p>';
     mi.appendChild(d1);
     var c2 = check('extra', '<b>[선택]</b> 이름·회사·직급 수집에 동의합니다.');
     mi.appendChild(c2[0]);
-    var d2 = h('details'); d2.innerHTML = '<summary>내용 보기</summary><p>수집 항목: 이름·회사·직급<br>목적: 상담 문의 응대와 자료 이용 현황 파악<br>보관 기간: 탈퇴할 때까지<br>동의하지 않아도 자료를 받을 수 있으며 이 경우 입력한 선택 항목은 저장하지 않습니다.</p>';
+    var d2 = h('details'); d2.innerHTML = '<summary>내용 보기</summary><p>수집 항목: 이름·회사·직급<br>목적: 상담 문의 응대와 자료 이용 현황 파악<br>보관 기간: 신청일부터 1년<br>동의하지 않아도 자료를 받을 수 있으며 이 경우 입력한 선택 항목은 저장하지 않습니다.</p>';
     mi.appendChild(d2);
     var c3 = check('news', '<b>[선택]</b> 솔라리스 뉴스레터와 소식을 이메일로 받겠습니다.');
     mi.appendChild(c3[0]);
@@ -644,8 +644,8 @@
     mi.appendChild(d3);
     more.appendChild(mi); f.appendChild(more);
     var bt = h('button', 'smw-f-submit'); bt.type = 'submit';
-    bt.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16v12H4zM4 7l8 6 8-6"/></svg>';
-    bt.appendChild(document.createTextNode('이메일로 받기'));
+    bt.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M6 11l6 6 6-6M5 20h14"/></svg>';
+    bt.appendChild(document.createTextNode('PDF 받기'));
     f.appendChild(bt);
     var msg = h('div', 'smw-f-msg'); msg.setAttribute('role', 'alert'); f.appendChild(msg);
     function open() { f.dataset.open = '1'; }
@@ -656,44 +656,50 @@
       var email = em.value.trim();
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { msg.textContent = '이메일 주소를 확인해 주세요.'; em.focus(); return; }
       if (!c1[1].checked) { msg.textContent = '필수 항목인 개인정보 수집·이용에 동의해 주세요.'; return; }
-      var clip = function (v) { return v.trim().replace(/\s+/g, ' ').slice(0, 40); };
-      var labels = [g.no || 'GUIDE'];
-      var body = { email: email, emailType: 'signup', labels: labels, newsletters: [], autoRedirect: true, redirect: location.origin + g.url };
-      if (c2[1].checked) {
-        if (clip(nm.value)) body.name = clip(nm.value);
-        if (clip(co.value)) labels.push('회사: ' + clip(co.value));
-        if (clip(ti.value)) labels.push('직급: ' + clip(ti.value));
+      var clip = function (v) { return v.trim().replace(/\s+/g, ' ').slice(0, 60); };
+      var extra = c2[1].checked, news = c3[1].checked;
+      var rec = {
+        email: email,
+        name: extra ? clip(nm.value) : '',
+        company: extra ? clip(co.value) : '',
+        title: extra ? clip(ti.value) : '',
+        guide: (g.no ? g.no + ' ' : '') + g.title,
+        agree: '동의',
+        extra: extra ? '동의' : '미동의',
+        news: news ? '동의' : '미동의',
+        page: location.pathname
+      };
+      /* 1. 바로 내려받기 */
+      var dl = h('a'); dl.href = g.file || g.url; dl.setAttribute('download', ''); dl.style.display = 'none';
+      document.body.appendChild(dl); dl.click(); setTimeout(function () { dl.remove(); }, 1000);
+      /* 2. 신청 기록 (구글 폼) */
+      var fm = lib.form || {};
+      if (fm.action && fm.fields) {
+        var fd = new FormData();
+        Object.keys(fm.fields).forEach(function (k) { if (rec[k] !== undefined) fd.append(fm.fields[k], rec[k]); });
+        fetch(fm.action, { method: 'POST', mode: 'no-cors', body: fd }).catch(function () {});
       }
-      if (c3[1].checked && lib.newsletter) body.newsletters = [{ name: lib.newsletter }];
-      body.labels = labels.map(function (n) { return { name: n }; });
-      bt.disabled = true;
-      try { localStorage.setItem('smw-guide-next', g.url); } catch (x) {}
-      fetch('/members/api/integrity-token/', { credentials: 'same-origin' })
-        .then(function (r) { return r.ok ? r.text() : ''; }).catch(function () { return ''; })
-        .then(function (tok) {
-          if (tok) body.integrityToken = tok;
-          return fetch('/members/api/send-magic-link/', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-        })
-        .then(function (r) {
-          if (!r.ok) throw new Error(r.status);
-          var ok = h('div', 'smw-f-ok'); ok.appendChild(h('b', '', '메일함을 확인해 주세요'));
-          ok.appendChild(document.createTextNode(email + '로 메일을 보냈습니다. 메일의 버튼을 누르면 바로 다운로드가 시작됩니다. 메일이 보이지 않으면 스팸함도 확인해 주세요.'));
-          f.replaceWith(ok);
-        })
-        .catch(function () { bt.disabled = false; msg.textContent = '전송하지 못했습니다. 잠시 뒤 다시 시도하거나 info@solarislaw.net으로 요청해 주세요.'; });
+      /* 3. 뉴스레터 동의자만 구독 확인 메일 */
+      if (news && lib.newsletter) {
+        var body = { email: email, emailType: 'signup', newsletters: [{ name: lib.newsletter }], labels: [{ name: g.no || 'GUIDE' }] };
+        if (rec.name) body.name = rec.name;
+        fetch('/members/api/integrity-token/', { credentials: 'same-origin' })
+          .then(function (r) { return r.ok ? r.text() : ''; }).catch(function () { return ''; })
+          .then(function (tok) {
+            if (tok) body.integrityToken = tok;
+            return fetch('/members/api/send-magic-link/', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+          }).catch(function () {});
+      }
+      var ok = h('div', 'smw-f-ok'); ok.appendChild(h('b', '', '다운로드를 시작했습니다'));
+      ok.appendChild(document.createTextNode('내려받기가 시작되지 않으면 '));
+      var again = h('a', '', '여기를 누르세요'); again.href = g.file || g.url; again.setAttribute('download', ''); again.style.cssText = 'color:inherit;text-decoration:underline';
+      ok.appendChild(again); ok.appendChild(document.createTextNode('.'));
+      if (news) ok.appendChild(h('div', '', '뉴스레터 구독 확인 메일을 보냈습니다. 메일의 버튼을 누르시면 구독이 완료됩니다.')).style.marginTop = '6px';
+      f.replaceWith(ok);
     });
     return f;
   }
-  function goPendingGuide() {
-    var next = null;
-    try { next = localStorage.getItem('smw-guide-next'); } catch (x) {}
-    if (member && next && /^\/[\w\-\/]+$/.test(next)) {
-      try { localStorage.removeItem('smw-guide-next'); } catch (x) {}
-      location.href = next;
-      return true;
-    }
-    return false;
-  }
+
 
   /* ---------- 포스트에 붙이기 ---------- */
   var POST_MIN = CFG.postStripMin || 768;
@@ -802,7 +808,7 @@
         return Promise.all([
           fetch(LIB_URL, { cache: 'no-cache' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }),
           checkMember()
-        ]).then(function (x) { state.lib = x[0]; if (goPendingGuide()) throw new Error('redirect'); return d; });
+        ]).then(function (x) { state.lib = x[0]; try { localStorage.removeItem('smw-guide-next'); } catch (e) {} return d; });
       })
       .then(function (d) {
         try { placer(); } catch (e) { if (state.el) state.el.remove(); return; }
