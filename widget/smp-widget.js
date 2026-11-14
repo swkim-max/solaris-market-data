@@ -7,6 +7,7 @@
   var LINK = CFG.link || '';
   var MIN_DESKTOP = CFG.minDesktop || 1280;
   var CARD_W = 300;
+  var C_SMP = '#2563a8', C_SMP_LAST = '#e8731a', C_JKM = '#c2410c', C_UP = '#d33a2c', C_DOWN = '#2563a8', C_TTF = '#7c5cc4', C_HH = '#2f8f6b';
   var GAP = 48;
 
   var CSS = [
@@ -22,12 +23,15 @@
     '.smw-big{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}',
     '.smw-num{font-size:30px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.01em}',
     '.smw-unit{font-size:12px;color:#8a8780}',
-    '.smw-chg{font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;margin-left:auto;white-space:nowrap}',
+    '.smw-chg{font-size:13px;font-weight:800;font-variant-numeric:tabular-nums;margin-left:auto;white-space:nowrap}',
     '.smw-sub{font-size:11px;color:#8a8780;margin-top:6px;font-variant-numeric:tabular-nums}',
-    '.smw-spark{display:block;width:100%;height:44px;margin-top:10px}',
+    '.smw-spark{display:block;width:100%;height:52px;margin-top:10px}',
+    '.smw-axis{display:flex;justify-content:space-between;font-size:10px;color:#8a8780;margin-top:4px;font-variant-numeric:tabular-nums}',
+    '.smw-up{color:'+C_UP+'}','.smw-down{color:'+C_DOWN+'}',
+    '.smw-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;vertical-align:1px}',
     '.smw-mini{display:flex;gap:14px;font-size:11px;color:#6b6862;margin-top:10px;font-variant-numeric:tabular-nums}',
     '.smw-mini b{color:#15171a;font-weight:700}',
-    '.smw-note{font-size:12.5px;line-height:1.65;color:#3d3b37;padding:14px 0 4px;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}',
+    '.smw-note{font-size:12.5px;line-height:1.65;color:#3d3b37;padding:14px 0 4px}',
     '.smw-link{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;text-decoration:none;margin-top:10px}',
     '.smw-link:hover{text-decoration:underline}',
     '.smw-foot{font-size:10px;line-height:1.5;color:#a3a09a;margin-top:12px}',
@@ -42,7 +46,7 @@
     '.smw-bar-vals{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13.5px;font-variant-numeric:tabular-nums}',
     '.smw-bar-vals span{white-space:nowrap}',
     '.smw-bar-vals b{font-weight:800}',
-    '.smw-bar-vals i{font-style:normal;font-size:11.5px;color:#6b6862;margin-left:3px}',
+    '.smw-bar-vals i{font-style:normal;font-size:11.5px;font-weight:700;margin-left:3px}',
     '.smw-chev{width:28px;height:28px;border-radius:50%;background:#f4f2ee;display:flex;align-items:center;justify-content:center;transition:transform .25s ease}',
     '.smw-band[data-open="1"] .smw-chev{transform:rotate(180deg)}',
     '.smw-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s ease}',
@@ -51,7 +55,7 @@
     '.smw-inner{padding:2px 16px 16px;border-top:1px solid #eeece8}',
     '.smw-two{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding-top:14px}',
     '.smw-two .smw-num{font-size:22px}',
-    '.smw-two .smw-spark{height:36px}',
+    '.smw-two .smw-spark{height:44px}',
     '@media (prefers-reduced-motion:reduce){.smw-body,.smw-chev{transition:none}}'
   ].join('\n');
 
@@ -67,6 +71,15 @@
   function num(v) { return v === null || v === undefined || v === '' || isNaN(+v) ? null : +v; }
   function f1(v) { return v === null ? '—' : (Math.round(v * 10) / 10).toFixed(1); }
   function sign(v) { return v === null ? '' : (v > 0 ? '▲ ' : v < 0 ? '▼ ' : '') + Math.abs(Math.round(v * 10) / 10).toFixed(1); }
+  function signCls(v) { return v > 0 ? 'smw-up' : v < 0 ? 'smw-down' : ''; }
+  function sentences(t, max) {
+    var parts = (t || '').split(/(?<=[.!?])\s+/), out = '';
+    for (var i = 0; i < parts.length; i++) {
+      if (out && (out + ' ' + parts[i]).length > max) break;
+      out = out ? out + ' ' + parts[i] : parts[i];
+    }
+    return out;
+  }
   function md(s) { var p = s.split('-'); return (+p[1]) + '/' + (+p[2]); }
   var RANGE = { low: '초반', mid: '중반', high: '후반' };
   function jkmText(row) {
@@ -109,21 +122,26 @@
     return e;
   }
   function bars(values, label) {
-    var W = 260, H = 44, n = values.length, gap = 3;
-    var max = Math.max.apply(null, values), min = Math.min.apply(null, values) * 0.8;
+    var W = 260, H = 52, n = values.length, gap = 3;
+    var max = Math.max.apply(null, values), min = Math.min.apply(null, values) * 0.75;
     var svg = svgEl('svg', { viewBox: '0 0 ' + W + ' ' + H, preserveAspectRatio: 'none', class: 'smw-spark', role: 'img', 'aria-label': label });
     var bw = (W - gap * (n - 1)) / n;
     values.forEach(function (v, i) {
-      var h = Math.max(2, (v - min) / (max - min || 1) * (H - 4));
+      var h = Math.max(3, (v - min) / (max - min || 1) * (H - 4));
       svg.appendChild(svgEl('rect', {
-        x: i * (bw + gap), y: H - h, width: bw, height: h, rx: 1.5,
-        fill: i === n - 1 ? 'var(--ghost-accent-color,#5b4a39)' : '#d9d5cd'
+        x: i * (bw + gap), y: H - h, width: bw, height: h, rx: 2,
+        fill: i === n - 1 ? C_SMP_LAST : C_SMP, 'fill-opacity': i === n - 1 ? 1 : 0.85
       }));
     });
     return svg;
   }
+  function axis(left, right) {
+    var a = h('div', 'smw-axis');
+    a.appendChild(h('span', '', left)); a.appendChild(h('span', '', right));
+    return a;
+  }
   function line(points, label) {
-    var W = 260, H = 44, pad = 3;
+    var W = 260, H = 52, pad = 3;
     var xs = points.map(function (p) { return +new Date(p.d); });
     var ys = points.map(function (p) { return num(p.jkm); });
     var x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs);
@@ -133,8 +151,8 @@
     var svg = svgEl('svg', { viewBox: '0 0 ' + W + ' ' + H, preserveAspectRatio: 'none', class: 'smw-spark', role: 'img', 'aria-label': label });
     var dpath = points.map(function (p, i) { return (i ? 'L' : 'M') + X(xs[i]).toFixed(1) + ' ' + Y(ys[i]).toFixed(1); }).join(' ');
     var area = dpath + ' L' + X(x1).toFixed(1) + ' ' + (H - pad) + ' L' + X(x0).toFixed(1) + ' ' + (H - pad) + ' Z';
-    svg.appendChild(svgEl('path', { d: area, fill: 'var(--ghost-accent-color,#5b4a39)', 'fill-opacity': '0.08' }));
-    svg.appendChild(svgEl('path', { d: dpath, fill: 'none', stroke: 'var(--ghost-accent-color,#5b4a39)', 'stroke-width': 1.6, 'vector-effect': 'non-scaling-stroke', 'stroke-linejoin': 'round' }));
+    svg.appendChild(svgEl('path', { d: area, fill: C_JKM, 'fill-opacity': '0.16' }));
+    svg.appendChild(svgEl('path', { d: dpath, fill: 'none', stroke: C_JKM, 'stroke-width': 2.2, 'vector-effect': 'non-scaling-stroke', 'stroke-linejoin': 'round' }));
     return svg;
   }
 
@@ -151,10 +169,17 @@
     var big = h('div', 'smw-big');
     big.appendChild(h('span', 'smw-num', f1(s.smp)));
     big.appendChild(h('span', 'smw-unit', '원/kWh'));
-    if (!compact) big.appendChild(h('span', 'smw-chg', sign(s.smpChg)));
+    if (!compact) big.appendChild(h('span', 'smw-chg ' + signCls(s.smpChg), sign(s.smpChg)));
     sec.appendChild(big);
-    sec.appendChild(h('div', 'smw-sub', compact ? sign(s.smpChg) + ' 전주 대비' : '전주 대비 · 최근 12주'));
-    if (s.weeks.length) sec.appendChild(bars(s.weeks.map(function (r) { return num(r.v); }), '최근 12주 육지 SMP 주간 평균 막대그래프'));
+    var sub = h('div', 'smw-sub');
+    if (compact) { sub.appendChild(h('span', signCls(s.smpChg), sign(s.smpChg))); sub.appendChild(document.createTextNode(' 전주 대비')); }
+    else sub.textContent = '전주 대비';
+    sec.appendChild(sub);
+    if (s.weeks.length) {
+      var vals = s.weeks.map(function (r) { return num(r.v); });
+      sec.appendChild(bars(vals, '최근 육지 SMP 주간 평균 막대그래프'));
+      sec.appendChild(axis(md(s.weeks[0].start) + '주', '최고 ' + Math.round(Math.max.apply(null, vals)) + ' · 최저 ' + Math.round(Math.min.apply(null, vals))));
+    }
     return sec;
   }
   function jkmBlock(s, compact) {
@@ -165,18 +190,22 @@
     if (!compact) big.appendChild(h('span', 'smw-unit', '/MMBtu'));
     sec.appendChild(big);
     sec.appendChild(h('div', 'smw-sub', '1년 전 ' + jkmText(s.jkmFirst)));
-    if (s.jkmLine.length > 1) sec.appendChild(line(s.jkmLine, '최근 1년 JKM 추이선'));
+    if (s.jkmLine.length > 1) {
+      sec.appendChild(line(s.jkmLine, '최근 1년 JKM 추이선'));
+      var fd = s.jkmLine[0].d.split('-');
+      sec.appendChild(axis(fd[0].slice(2) + '.' + (+fd[1]), '지금'));
+    }
     if (!compact) {
       var mini = h('div', 'smw-mini');
-      var a = h('span'); a.appendChild(document.createTextNode('유럽 TTF ')); a.appendChild(h('b', '', f1(s.ttf)));
-      var b = h('span'); b.appendChild(document.createTextNode('미국 Henry Hub ')); b.appendChild(h('b', '', f1(s.hh)));
+      var a = h('span'); var da = h('i', 'smw-dot'); da.style.background = C_TTF; a.appendChild(da); a.appendChild(document.createTextNode('유럽 TTF ')); a.appendChild(h('b', '', f1(s.ttf)));
+      var b = h('span'); var db = h('i', 'smw-dot'); db.style.background = C_HH; b.appendChild(db); b.appendChild(document.createTextNode('미국 Henry Hub ')); b.appendChild(h('b', '', f1(s.hh)));
       mini.appendChild(a); mini.appendChild(b);
       sec.appendChild(mini);
     }
     return sec;
   }
   function tail(box, s) {
-    if (s.note && s.note.text) box.appendChild(h('div', 'smw-note', s.note.text));
+    if (s.note && s.note.text) box.appendChild(h('div', 'smw-note', sentences(s.note.text, 130)));
     if (LINK) {
       var a = h('a', 'smw-link smw-acc', 'SMP·LNG 추이 전체 보기 →');
       a.href = LINK;
@@ -211,9 +240,9 @@
     var mid = h('span');
     mid.appendChild(h('div', 'smw-bar-top', '이번 주 전력·가스 시세 · ' + s.range));
     var vals = h('div', 'smw-bar-vals');
-    var v1 = h('span'); v1.appendChild(document.createTextNode('SMP ')); v1.appendChild(h('b', '', f1(s.smp) + '원')); v1.appendChild(h('i', '', sign(s.smpChg)));
+    var v1 = h('span'); v1.appendChild(document.createTextNode('SMP ')); v1.appendChild(h('b', '', f1(s.smp) + '원')); v1.appendChild(h('i', signCls(s.smpChg), sign(s.smpChg)));
     var v2 = h('span'); v2.appendChild(document.createTextNode('JKM ')); v2.appendChild(h('b', '', jkmText(s.jkm)));
-    if (s.jkmDir !== null && s.jkmDir !== 0) v2.appendChild(h('i', '', s.jkmDir > 0 ? '▲' : '▼'));
+    if (s.jkmDir !== null && s.jkmDir !== 0) v2.appendChild(h('i', signCls(s.jkmDir), s.jkmDir > 0 ? '▲' : '▼'));
     vals.appendChild(v1); vals.appendChild(v2);
     mid.appendChild(vals);
     bar.appendChild(mid);
@@ -297,6 +326,11 @@
   function boot() {
     if (!DATA_URL) return;
     if (CFG.homeOnly !== false && !document.body.classList.contains('home-template')) return;
+    if (CFG.preview) {
+      var on = /[?&]smw=preview\b/.test(location.search);
+      try { if (on) sessionStorage.setItem('smw-preview', '1'); else on = sessionStorage.getItem('smw-preview') === '1'; } catch (e) {}
+      if (!on) return;
+    }
     injectCss();
     fetch(DATA_URL, { cache: 'no-cache' })
       .then(function (res) { if (!res.ok) throw new Error(res.status); return res.json(); })
