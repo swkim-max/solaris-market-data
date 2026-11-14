@@ -52,11 +52,32 @@
     '.smw-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s ease}',
     '.smw-band[data-open="1"] .smw-body{grid-template-rows:1fr}',
     '.smw-body>div{overflow:hidden}',
-    '.smw-inner{padding:2px 16px 16px;border-top:1px solid #eeece8}',
+    '.smw-inner{padding:2px 16px 16px}',
+    '.smw-inner .smw-meta{font-size:10.5px;color:#8a8780;padding:12px 0 0}',
     '.smw-two{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding-top:14px}',
     '.smw-two .smw-num{font-size:22px}',
     '.smw-two .smw-spark{height:44px}',
-    '@media (prefers-reduced-motion:reduce){.smw-body,.smw-chev{transition:none}}'
+    '.smw-tick{background:#161a21;color:#e9e6df;overflow:hidden;white-space:nowrap;position:relative;font-variant-numeric:tabular-nums}',
+    '.smw-tick::before,.smw-tick::after{content:"";position:absolute;top:0;bottom:0;width:22px;z-index:1;pointer-events:none}',
+    '.smw-tick::before{left:0;background:linear-gradient(90deg,#161a21,rgba(22,26,33,0))}',
+    '.smw-tick::after{right:0;background:linear-gradient(270deg,#161a21,rgba(22,26,33,0))}',
+    '.smw-track{display:inline-flex;animation:smw-scroll var(--smw-dur,32s) linear infinite}',
+    '.smw-tick:hover .smw-track{animation-play-state:paused}',
+    '.smw-item{display:inline-flex;align-items:baseline;gap:6px;padding:0 18px;font-size:12.5px;letter-spacing:.01em}',
+    '.smw-item .k{color:#9aa3b2;font-size:11px;font-weight:700;letter-spacing:.04em}',
+    '.smw-item .v{color:#fff;font-weight:800}',
+    '.smw-item .u{color:#9aa3b2;font-size:10.5px}',
+    '.smw-item .c{font-weight:800}',
+    '.smw-item .up{color:#ff5b4f}.smw-item .down{color:#4da3ff}',
+    '.smw-sep{color:#3b4250;padding:0 2px}',
+    '@keyframes smw-scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}',
+    '.smw-card{padding-top:0;overflow:hidden}',
+    '.smw-card .smw-tick{margin:0 -20px 14px;padding:10px 0}',
+    '.smw-band .smw-bar{background:#161a21;padding:0 12px 0 0;grid-template-columns:1fr auto;gap:0 8px}',
+    '.smw-band .smw-tick{padding:13px 0;min-width:0}',
+    '.smw-band .smw-chev{background:#2a303b}',
+    '.smw-band .smw-chev path{stroke:#e9e6df}',
+    '@media (prefers-reduced-motion:reduce){.smw-body,.smw-chev{transition:none}.smw-track{animation:none}.smw-tick{overflow-x:auto}}'
   ].join('\n');
 
   function injectCss() {
@@ -93,8 +114,11 @@
       .sort(function (a, b) { return a.d < b.d ? -1 : 1; });
     var lastW = w[w.length - 1], prevW = w[w.length - 2];
     var lastJ = l[l.length - 1], prevJ = l[l.length - 2], firstJ = l[0];
-    var lastTtf = (d.lng || []).filter(function (r) { return num(r.ttf) !== null; }).sort(function (a, b) { return a.d < b.d ? -1 : 1; }).pop();
-    var lastHh = (d.lng || []).filter(function (r) { return num(r.hh) !== null; }).sort(function (a, b) { return a.d < b.d ? -1 : 1; }).pop();
+    var byD = function (k) { return (d.lng || []).filter(function (r) { return num(r[k]) !== null; }).sort(function (a, b) { return a.d < b.d ? -1 : 1; }); };
+    var tt = byD('ttf'), hh = byD('hh');
+    var lastTtf = tt[tt.length - 1], lastHh = hh[hh.length - 1];
+    var m = (d.smp_monthly || []).filter(function (r) { return num(r.v) !== null; }).sort(function (a, b) { return a.m < b.m ? -1 : 1; });
+    var lm = m[m.length - 1], pm = m[m.length - 2];
     return {
       weeks: w.slice(-12),
       jkmLine: l,
@@ -106,6 +130,11 @@
       jkmFirst: firstJ,
       ttf: lastTtf ? num(lastTtf.ttf) : null,
       hh: lastHh ? num(lastHh.hh) : null,
+      ttfChg: tt.length > 1 ? num(lastTtf.ttf) - num(tt[tt.length - 2].ttf) : null,
+      hhChg: hh.length > 1 ? num(lastHh.hh) - num(hh[hh.length - 2].hh) : null,
+      month: lm ? (+lm.m.slice(5)) + '월' : '',
+      smpMonth: lm ? num(lm.v) : null,
+      smpMonthChg: lm && pm ? num(lm.v) - num(pm.v) : null,
       note: d.note || null,
       src: d.sources || {}
     };
@@ -211,10 +240,39 @@
     box.appendChild(h('div', 'smw-foot', '출처: ' + (s.src.smp || '전력거래소') + ', ' + (s.src.lng || 'JOGMEC') + '. 시장 동향 참고 자료이며 개별 거래·투자 판단의 근거가 아닙니다.'));
   }
 
+  function ticker(s) {
+    var items = [
+      ['육지 SMP 주간', f1(s.smp), '원/kWh', s.smpChg],
+      ['SMP ' + s.month + ' 평균', f1(s.smpMonth), '원/kWh', s.smpMonthChg],
+      ['JKM 아시아 LNG', f1(s.jkm ? num(s.jkm.jkm) : null), '$/MMBtu', s.jkmDir],
+      ['TTF 유럽', f1(s.ttf), '$/MMBtu', s.ttfChg],
+      ['Henry Hub 미국', f1(s.hh), '$/MMBtu', s.hhChg]
+    ];
+    var box = h('div', 'smw-tick');
+    box.setAttribute('role', 'marquee');
+    box.setAttribute('aria-label', items.map(function (it) { return it[0] + ' ' + it[1] + it[2] + (it[3] ? ' ' + sign(it[3]) : ''); }).join(', '));
+    var track = h('div', 'smw-track');
+    track.setAttribute('aria-hidden', 'true');
+    for (var rep = 0; rep < 2; rep++) {
+      items.forEach(function (it) {
+        var el = h('span', 'smw-item');
+        el.appendChild(h('span', 'k', it[0]));
+        el.appendChild(h('span', 'v', it[1]));
+        el.appendChild(h('span', 'u', it[2]));
+        if (it[3] !== null && it[3] !== undefined) el.appendChild(h('span', 'c ' + (it[3] > 0 ? 'up' : it[3] < 0 ? 'down' : ''), sign(it[3])));
+        track.appendChild(el);
+        track.appendChild(h('span', 'smw-sep', '·'));
+      });
+    }
+    box.appendChild(track);
+    return box;
+  }
+
   function renderCard(d) {
     var s = summarize(d);
     var card = h('aside', 'smw smw-card');
     card.setAttribute('aria-label', '이번 주 전력·가스 시세');
+    card.appendChild(ticker(s));
     var head = h('div', 'smw-head');
     head.appendChild(h('span', 'smw-title', '전력·가스 시세'));
     head.appendChild(h('span', 'smw-date', s.range + ' 기준'));
@@ -233,16 +291,7 @@
     var bar = h('button', 'smw-bar');
     bar.type = 'button';
     bar.setAttribute('aria-expanded', 'false');
-    bar.appendChild(h('span', 'smw-stripe'));
-    var mid = h('span');
-    mid.appendChild(h('div', 'smw-bar-top', '이번 주 전력·가스 시세 · ' + s.range));
-    var vals = h('div', 'smw-bar-vals');
-    var v1 = h('span'); v1.appendChild(document.createTextNode('SMP ')); v1.appendChild(h('b', '', f1(s.smp) + '원')); v1.appendChild(h('i', signCls(s.smpChg), sign(s.smpChg)));
-    var v2 = h('span'); v2.appendChild(document.createTextNode('JKM ')); v2.appendChild(h('b', '', jkmText(s.jkm)));
-    if (s.jkmDir !== null && s.jkmDir !== 0) v2.appendChild(h('i', signCls(s.jkmDir), s.jkmDir > 0 ? '▲' : '▼'));
-    vals.appendChild(v1); vals.appendChild(v2);
-    mid.appendChild(vals);
-    bar.appendChild(mid);
+    bar.appendChild(ticker(s));
     var chev = h('span', 'smw-chev');
     chev.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5f5c56" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
     bar.appendChild(chev);
@@ -251,6 +300,7 @@
     var body = h('div', 'smw-body');
     var wrap = h('div');
     var inner = h('div', 'smw-inner');
+    inner.appendChild(h('div', 'smw-meta', '이번 주 전력·가스 시세 · ' + s.range + ' 기준'));
     var two = h('div', 'smw-two');
     two.appendChild(smpBlock(s, true));
     two.appendChild(jkmBlock(s, true));
