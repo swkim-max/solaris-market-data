@@ -160,7 +160,7 @@
     '.smw-f{margin-top:14px}',
     '.smw-f-row{display:flex;border:1px solid #cfc9bf;border-radius:7px;background:#fff;overflow:hidden;transition:border-color .15s,box-shadow .15s}',
     '.smw-f-row:focus-within{border-color:var(--ghost-accent-color,#60503e);box-shadow:0 0 0 3px rgba(96,80,62,.12)}',
-    '.smw-f-row input{flex:1;min-width:0;border:0 !important;box-shadow:none !important;outline:none;font:inherit;font-size:13px;padding:10px 11px;background:transparent;color:#15171a}',
+    '.smw-f-row input{flex:1 !important;min-width:0 !important;width:auto !important;height:40px !important;margin:0 !important;border:0 !important;border-radius:0 !important;box-shadow:none !important;outline:none;font:inherit;font-size:13px !important;line-height:40px !important;padding:0 11px !important;background:transparent !important;color:#15171a !important}',
     '.smw-f-go{all:unset;flex:none;width:40px;display:flex;align-items:center;justify-content:center;background:var(--ghost-accent-color,#60503e);color:#fff;cursor:pointer}',
     '.smw-f-go:focus-visible{outline:2px solid #15171a;outline-offset:-3px}',
     '.smw-f[data-open="1"] .smw-f-go{display:none}',
@@ -169,11 +169,18 @@
     '.smw-f-more{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s ease}',
     '.smw-f[data-open="1"] .smw-f-more{grid-template-rows:1fr}',
     '.smw-f-more>div{overflow:hidden}',
-    '.smw-f-more input[type=text]{display:block;width:100%;font:inherit;font-size:12.5px;padding:8px 10px;border:1px solid #dcd8d0;border-radius:6px;background:#fff;color:#15171a;outline:none;margin-top:6px}',
+    '.smw-f-more input[type=text]{display:block !important;width:100% !important;height:36px !important;font:inherit;font-size:12.5px !important;line-height:36px !important;padding:0 10px !important;border:1px solid #dcd8d0 !important;border-radius:6px !important;background:#fff !important;color:#15171a !important;outline:none;margin:6px 0 0 !important}',
     '.smw-f-more input[type=text]:focus{border-color:var(--ghost-accent-color,#60503e)}',
     '.smw-f-opt{font-size:11px;color:#a3a09a;margin:10px 0 0}',
-    '.smw-f label.ck{display:grid;grid-template-columns:16px 1fr;gap:6px;align-items:start;font-size:11.5px;line-height:1.5;color:#5f5c56;margin-top:8px;cursor:pointer}',
-    '.smw-f label.ck input{margin:2px 0 0;accent-color:var(--ghost-accent-color,#60503e)}',
+    '.smw-f label.ck{display:grid;grid-template-columns:16px 1fr;gap:7px;align-items:start;font-size:11.5px;line-height:1.5;color:#5f5c56;margin-top:8px;cursor:pointer}',
+    '.smw-f label.ck{position:relative}',
+    '.smw-f label.ck input[type=checkbox]{position:absolute !important;left:0 !important;top:0 !important;opacity:0 !important;width:16px !important;height:16px !important;min-width:0 !important;padding:0 !important;margin:0 !important;border:0 !important;appearance:auto !important}',
+    '.smw-f .box{width:15px;height:15px;margin-top:1px;border:1.5px solid #b9b2a7;border-radius:3px;background:#fff;display:flex;align-items:center;justify-content:center;transition:background .12s,border-color .12s}',
+    '.smw-f .box::after{content:"";width:4px;height:8px;border:solid #fff;border-width:0 2px 2px 0;transform:translate(0,-1px) rotate(45deg);opacity:0}',
+    '.smw-f input:checked+.box{background:var(--ghost-accent-color,#60503e);border-color:var(--ghost-accent-color,#60503e)}',
+    '.smw-f input:checked+.box::after{opacity:1}',
+    '.smw-f input:focus-visible+.box{outline:2px solid var(--ghost-accent-color,#60503e);outline-offset:2px}',
+    '.smw-f input{box-sizing:border-box !important;box-shadow:none !important;min-height:0 !important}',
     '.smw-f label.ck b{font-weight:800;color:#15171a}',
     '.smw-f details{font-size:11px;color:#8a8780;margin:3px 0 0 22px}',
     '.smw-f summary{cursor:pointer;color:#a3a09a}',
@@ -606,7 +613,7 @@
   }
   function check(id, html) {
     var l = h('label', 'ck'); var c = h('input'); c.type = 'checkbox'; c.name = id;
-    var s = h('span'); s.innerHTML = html; l.appendChild(c); l.appendChild(s); return [l, c];
+    var s = h('span'); s.innerHTML = html; l.appendChild(c); l.appendChild(h('span', 'box')); l.appendChild(s); return [l, c];
   }
   function guideForm(g, lib) {
     var f = h('form', 'smw-f'); f.noValidate = true; f.dataset.open = '0';
